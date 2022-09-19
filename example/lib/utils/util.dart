@@ -12,9 +12,9 @@ class Utils {
     return _instance;
   }
 
-  static String orderId = "order_18482EymoaHdJ9PAwYU0onekw72KYzM";
-  static String orderToken = "uEa5ZeOcWAbopeDtACKD";
-  static CFEnvironment environment = CFEnvironment.PRODUCTION;
+  static String orderId = "order_3242Eypmd5FgXn0CUfibZ5vWEfZ8GY";
+  static String orderToken = "mAyIMOBjkB1ay0LcBm7K";
+  static CFEnvironment environment = CFEnvironment.SANDBOX;
 
   static CFSession? createSession() {
     try {
