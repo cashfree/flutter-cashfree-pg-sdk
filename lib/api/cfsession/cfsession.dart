@@ -1,7 +1,7 @@
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 
-import 'package:flutter_cashfree_pg_sdk/utils/CFEnums.dart';
+import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 
 class CFSessionBuilder {
 
