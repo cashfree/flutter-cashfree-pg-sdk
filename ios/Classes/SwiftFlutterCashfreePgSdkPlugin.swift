@@ -101,12 +101,9 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     private func createPaymentComponents(components: [String]) throws -> CFPaymentComponent {
         var componentBuilder = CFPaymentComponent.CFPaymentComponentBuilder()
         var newComponents: [String] = []
+        newComponents.append("order-details")
         for component in components {
-            if component == "order_details" {
-                newComponents.append("order-details")
-            } else {
-                newComponents.append(component)
-            }
+            newComponents.append(component)
         }
         componentBuilder = componentBuilder.enableComponents(newComponents)
         do {

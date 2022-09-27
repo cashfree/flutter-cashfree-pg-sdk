@@ -4,11 +4,11 @@ import '../../utils/cfexceptionconstants.dart';
 import '../../utils/cfexceptions.dart';
 
 class CFPaymentComponentBuilder {
-  List<CFPaymentModes> _components = [CFPaymentModes.ORDER_DETAILS, CFPaymentModes.CARD, CFPaymentModes.UPI, CFPaymentModes.NETBANKING, CFPaymentModes.WALLET, CFPaymentModes.PAYLATER, CFPaymentModes.EMI];
+  List<CFPaymentModes> _components = [CFPaymentModes.CARD, CFPaymentModes.UPI, CFPaymentModes.NETBANKING, CFPaymentModes.WALLET, CFPaymentModes.PAYLATER, CFPaymentModes.EMI];
 
   CFPaymentComponentBuilder setComponents(List<CFPaymentModes> components) {
     if(components.isNotEmpty) {
-      if(components.length == 1 && components[0] == CFPaymentModes.ORDER_DETAILS) {
+      if(components.isEmpty) {
         throw CFException(CFExceptionConstants.ONE_PAYMENT_MODE_IS_REQUIRED);
       }
       _components = components;
@@ -28,7 +28,7 @@ class CFPaymentComponentBuilder {
 
 class CFPaymentComponent {
 
-  List<CFPaymentModes> _components = [CFPaymentModes.ORDER_DETAILS, CFPaymentModes.CARD, CFPaymentModes.UPI, CFPaymentModes.NETBANKING, CFPaymentModes.WALLET, CFPaymentModes.PAYLATER, CFPaymentModes.EMI];
+  List<CFPaymentModes> _components = [CFPaymentModes.CARD, CFPaymentModes.UPI, CFPaymentModes.NETBANKING, CFPaymentModes.WALLET, CFPaymentModes.PAYLATER, CFPaymentModes.EMI];
   CFPaymentComponent._();
 
   CFPaymentComponent(CFPaymentComponentBuilder builder) {

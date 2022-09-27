@@ -4,7 +4,6 @@ enum CFEnvironment {
 }
 
 enum CFPaymentModes{
-  ORDER_DETAILS,
   CARD,
   UPI,
   NETBANKING,
