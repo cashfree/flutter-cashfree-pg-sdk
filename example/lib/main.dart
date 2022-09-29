@@ -4,10 +4,10 @@ import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentcomponents/cfpaymentcomponent.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cftheme/cftheme.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
-import 'package:flutter_cashfree_pg_sdk_example/utils/util.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,10 +56,27 @@ class _MyAppState extends State<MyApp> {
     print("Error while making payment");
   }
 
+  String orderId = "order_3242Eypmd5FgXn0CUfibZ5vWEfZ8GY";
+  String orderToken = "mAyIMOBjkB1ay0LcBm7K";
+  CFEnvironment environment = CFEnvironment.SANDBOX;
+
+  CFSession? createSession() {
+    try {
+      var session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setOrderToken(orderToken).build();
+      return session;
+    } on CFException catch (e) {
+      print(e.message);
+    }
+    return null;
+  }
+
   pay() async {
     try {
-      var session = Utils.createSession();
+      var session = createSession();
       List<CFPaymentModes> components = <CFPaymentModes>[];
+      components.add(CFPaymentModes.UPI);
+      components.add(CFPaymentModes.CARD);
+      components.add(CFPaymentModes.WALLET);
       var paymentComponent = CFPaymentComponentBuilder().setComponents(components).build();
 
       var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#FF0000").setPrimaryFont("Menlo").setSecondaryFont("Futura").build();
