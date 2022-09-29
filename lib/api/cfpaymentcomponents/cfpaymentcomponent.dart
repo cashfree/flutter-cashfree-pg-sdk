@@ -8,9 +8,6 @@ class CFPaymentComponentBuilder {
 
   CFPaymentComponentBuilder setComponents(List<CFPaymentModes> components) {
     if(components.isNotEmpty) {
-      if(components.isEmpty) {
-        throw CFException(CFExceptionConstants.ONE_PAYMENT_MODE_IS_REQUIRED);
-      }
       _components = components;
     }
     return this;
