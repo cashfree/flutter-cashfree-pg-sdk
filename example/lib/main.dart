@@ -56,9 +56,9 @@ class _MyAppState extends State<MyApp> {
     print("Error while making payment");
   }
 
-  String orderId = "order_3242Eypmd5FgXn0CUfibZ5vWEfZ8GY";
-  String orderToken = "mAyIMOBjkB1ay0LcBm7K";
-  CFEnvironment environment = CFEnvironment.SANDBOX;
+  String orderId = "order_18482FRGCp8M5y2lUZJwbHecDEXiz7G";
+  String orderToken = "UO8wqcClSsYgXDEd2VkK";
+  CFEnvironment environment = CFEnvironment.PRODUCTION;
 
   CFSession? createSession() {
     try {
@@ -74,9 +74,6 @@ class _MyAppState extends State<MyApp> {
     try {
       var session = createSession();
       List<CFPaymentModes> components = <CFPaymentModes>[];
-      components.add(CFPaymentModes.UPI);
-      components.add(CFPaymentModes.CARD);
-      components.add(CFPaymentModes.WALLET);
       var paymentComponent = CFPaymentComponentBuilder().setComponents(components).build();
 
       var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#FF0000").setPrimaryFont("Menlo").setSecondaryFont("Futura").build();
