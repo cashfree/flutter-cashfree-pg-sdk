@@ -306,7 +306,7 @@ class FlutterCashfreePgSdkWeb {
         deviceType = "m";
       }
 
-      var cfConfig = CFConfig(components: componentsToSend, orderToken: orderToken, pluginName: "fx-d-0.0.1-3.3.1-$deviceType", onFailure: of, onSuccess: os, style: style);
+      var cfConfig = CFConfig(components: componentsToSend, orderToken: orderToken, pluginName: "flutter-d-0.0.1-3.3.1-$deviceType-x-x-x-x", onFailure: of, onSuccess: os, style: style);
       c.initialiseDropin(element, cfConfig);
     });
     document.querySelector("body")?.children.add(script);
