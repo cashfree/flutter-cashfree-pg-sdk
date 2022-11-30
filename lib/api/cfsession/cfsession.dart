@@ -4,9 +4,9 @@ import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 
 class CFSessionBuilder {
-
   CFEnvironment? _environment;
   String? _orderId;
+  String? _paymentSessionId;
   String? _orderToken;
 
   CFSessionBuilder();
@@ -21,8 +21,15 @@ class CFSessionBuilder {
     return this;
   }
 
+  @Deprecated(
+      "order_token will no longer be used in the integration steps. Please switch to payment_session_id using setPaymentSessionId() method")
   CFSessionBuilder setOrderToken(String orderToken) {
     _orderToken = orderToken;
+    return this;
+  }
+
+  CFSessionBuilder setPaymentSessionId(String paymentSessionId) {
+    _paymentSessionId = paymentSessionId;
     return this;
   }
 
@@ -31,7 +38,11 @@ class CFSessionBuilder {
   }
 
   String getOrderToken() {
-    return _orderToken!;
+    return _orderToken ?? "";
+  }
+
+  String getPaymentSessionId() {
+    return _paymentSessionId!;
   }
 
   CFEnvironment getEnvironment() {
@@ -39,30 +50,31 @@ class CFSessionBuilder {
   }
 
   CFSession build() {
-    if(_environment == null) {
+    if (_environment == null) {
       throw CFException(CFExceptionConstants.ENVIRONMENT_NOT_PRESENT);
     }
-    if(_orderId == null || _orderId!.isEmpty) {
+    if (_orderId == null || _orderId!.isEmpty) {
       throw CFException(CFExceptionConstants.ORDER_ID_NOT_PRESENT);
     }
-    if(_orderToken == null || _orderToken!.isEmpty) {
-      throw CFException(CFExceptionConstants.ORDER_TOKEN_NOT_PRESENT);
+    if (_paymentSessionId == null || _paymentSessionId!.isEmpty) {
+      throw CFException(CFExceptionConstants.PAYMENT_SESSION_ID_NOT_PRESENT);
     }
     return CFSession(this);
   }
-
 }
 
 class CFSession {
   late CFEnvironment _environment;
   late String _orderId;
   late String _orderToken;
+  late String _paymentSessionId;
 
   CFSession._();
 
   CFSession(CFSessionBuilder sessionBuilder) {
     _environment = sessionBuilder.getEnvironment();
     _orderToken = sessionBuilder.getOrderToken();
+    _paymentSessionId = sessionBuilder.getPaymentSessionId();
     _orderId = sessionBuilder.getOrderId();
   }
 
@@ -74,7 +86,13 @@ class CFSession {
     return _orderToken;
   }
 
+  String getPaymentSessionId() {
+    return _paymentSessionId;
+  }
+
   String getEnvironment() {
-    return _environment == CFEnvironment.SANDBOX ? CFEnvironment.SANDBOX.name : CFEnvironment.PRODUCTION.name;
+    return _environment == CFEnvironment.SANDBOX
+        ? CFEnvironment.SANDBOX.name
+        : CFEnvironment.PRODUCTION.name;
   }
 }
