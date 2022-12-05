@@ -57,6 +57,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
             let theme = args["theme"] as? Dictionary<String, String> ?? [:]
             let paymentComponents = args["paymentComponents"] as? Dictionary<String, AnyObject> ?? [:]
             let components = paymentComponents["components"] as? [String] ?? []
+            
             do {
                 let finalSession = try self.createSession(session: session)
                 let cfTheme = try self.createTheme(theme: theme)
@@ -93,12 +94,13 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     environment = .PRODUCTION
                 }
             }
-            let session = try CFSession.CFSessionBuilder()
-                .setOrderID(session["order_id"] ?? "")
+            let cfSession = try CFSession.CFSessionBuilder()
                 .setEnvironment(environment)
-                .setOrderToken(session["order_token"] ?? "")
+                .setOrderID(session["order_id"] ?? "")
+                .setPaymentSessionId(session["payment_session_id"] ?? "")
                 .build()
-            return session
+            
+            return cfSession
         } catch let e {
             let err = e as! CashfreeError
             throw err

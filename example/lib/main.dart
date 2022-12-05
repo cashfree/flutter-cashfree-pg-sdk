@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
@@ -57,12 +57,18 @@ class _MyAppState extends State<MyApp> {
   }
 
   String orderId = "order_18482FRGCp8M5y2lUZJwbHecDEXiz7G";
-  String orderToken = "UO8wqcClSsYgXDEd2VkK";
+  String orderToken = "order_token";
+  String paymentSessionId = "session_3GP-joihoisaufhkafdkjhf-hasgdkjashdlasjhdlaksdjh-ksakdhjhasgdjashgf";
   CFEnvironment environment = CFEnvironment.PRODUCTION;
 
   CFSession? createSession() {
     try {
-      var session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setOrderToken(orderToken).build();
+      CFSession session;
+      if (kIsWeb) {
+        session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setOrderToken(orderToken).build();
+      } else {
+        session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setPaymentSessionId(paymentSessionId).build();
+      }
       return session;
     } on CFException catch (e) {
       print(e.message);
