@@ -57,8 +57,8 @@ external Cashfree get cashfree;
 
 @JS()
 class Cashfree {
-  external Cashfree();
-  external void initialiseDropin(Element element, CFConfig cfConfig);
+  external Cashfree(String paymentSessionId);
+  external void drop(Element element, CFConfig cfConfig);
 }
 
 @JS()
@@ -252,15 +252,14 @@ class FlutterCashfreePgSdkWeb {
     _verifyPayment = CFPaymentGatewayService.verifyPayment;
 
     String environment = session["environment"] as String;
-    String orderToken = session["order_token"] as String;
+    String paymentSessionId = session["payment_session_id"] as String;
 
     var paymentComponents = arguments["paymentComponents"] as dynamic;
     var components = paymentComponents["components"] as List<dynamic>;
     List<String> componentsToSend = [];
+    componentsToSend.add("order-details");
     for(int i = 0; i < components.length; i++) {
-      if(components[i] == "order_details") {
-        componentsToSend.add("order-details");
-      } else if(components[i] == "wallet") {
+      if(components[i] == "wallet") {
         componentsToSend.add("app");
       } else if(components[i] == "emi") {
         componentsToSend.add("creditcardemi");
@@ -287,27 +286,20 @@ class FlutterCashfreePgSdkWeb {
     var script = document.createElement("SCRIPT") as ScriptElement;
     if(environment == "SANDBOX") {
       script.src =
-      "https://sdk.cashfree.com/js/flutter/1.0.26/dropinClient.sandbox.js";
+      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js";
     } else {
       script.src =
-      "https://sdk.cashfree.com/js/flutter/1.0.26/dropinClient.prod.js";
+      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
     }
     script.onLoad.first.then((value) {
-      var c = Cashfree();
+      var c = Cashfree(paymentSessionId);
 
       var element = document.getElementById("cf-flutter-placeholder") as Element;
       var os = allowInterop(onSuccess);
       var of = allowInterop(onFailure);
-      final isWebMobile = kIsWeb &&
-          (defaultTargetPlatform == TargetPlatform.iOS ||
-              defaultTargetPlatform == TargetPlatform.android);
-      var deviceType = "d"; // desktop
-      if(isWebMobile) {
-        deviceType = "m";
-      }
 
-      var cfConfig = CFConfig(components: componentsToSend, orderToken: orderToken, pluginName: "flutter-d-0.0.1-3.3.1-$deviceType-x-x-x-x", onFailure: of, onSuccess: os, style: style);
-      c.initialiseDropin(element, cfConfig);
+      var cfConfig = CFConfig(components: componentsToSend, pluginName: "jflt-d-2.0.0-3.3.9", onFailure: of, onSuccess: os, style: style);
+      c.drop(element, cfConfig);
     });
     document.querySelector("body")?.children.add(script);
   }

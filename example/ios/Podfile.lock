@@ -1,16 +1,16 @@
 PODS:
-  - CashfreeAnalyticsSDK (1.0.15):
-    - CFNetworkSDK (~> 1.0)
-  - CashfreePG (1.1.3):
-    - CashfreePGUISDK (~> 1.1.5)
-  - CashfreePGCoreSDK (1.1.4):
-    - CashfreeAnalyticsSDK (~> 1.0.15)
-  - CashfreePGUISDK (1.1.5):
-    - CashfreePGCoreSDK (~> 1.1.4)
-  - CFNetworkSDK (1.0.13)
+  - CashfreeAnalyticsSDK (2.0.0):
+    - CFNetworkSDK (~> 2.0.0)
+  - CashfreePG (2.0.1):
+    - CashfreePGUISDK (~> 2.0.1)
+  - CashfreePGCoreSDK (2.0.1):
+    - CashfreeAnalyticsSDK (~> 2.0.0)
+  - CashfreePGUISDK (2.0.1):
+    - CashfreePGCoreSDK (~> 2.0.1)
+  - CFNetworkSDK (2.0.0)
   - Flutter (1.0.0)
   - flutter_cashfree_pg_sdk (0.0.1):
-    - CashfreePG (~> 1.1.3)
+    - CashfreePG (~> 2.0.1)
     - Flutter
 
 DEPENDENCIES:
@@ -32,13 +32,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_cashfree_pg_sdk/ios"
 
 SPEC CHECKSUMS:
-  CashfreeAnalyticsSDK: 10331d08cfe8d40324a2feb3844a5672a0a8bc9e
-  CashfreePG: e35583075c568b2e3278079642b716145ea07e40
-  CashfreePGCoreSDK: 6b32974224c70d3bc67f96079983a76cd3272d35
-  CashfreePGUISDK: 9ebf844ee95a78c87624ae4691292021b11349ac
-  CFNetworkSDK: 20bbc619e9dfb8e257a96bbdbc884bd3e8490e78
+  CashfreeAnalyticsSDK: d36845057f2f2bfda662dbe8c29a64f56805ec48
+  CashfreePG: 5bf71604f88a0af20bc0fcbec1faa466ad21077b
+  CashfreePGCoreSDK: 6992b40a99bf192b930ff46f631d56e1db088692
+  CashfreePGUISDK: 4714435dbdbc9c19bc222991a132c0a9e3578088
+  CFNetworkSDK: fca644b42b741bd154764bc2c67d85008a9be489
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_cashfree_pg_sdk: f15c1aa3b6d24cce135ec1d8224f033a44a90ed5
+  flutter_cashfree_pg_sdk: 6a175bbc96f2ef9d5a947073fbaff91e5ff3b821
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 

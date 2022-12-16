@@ -56,7 +56,7 @@ class CFSessionBuilder {
     if (_orderId == null || _orderId!.isEmpty) {
       throw CFException(CFExceptionConstants.ORDER_ID_NOT_PRESENT);
     }
-    if (_paymentSessionId == null || _paymentSessionId!.isEmpty) {
+    if(_paymentSessionId == null || _paymentSessionId!.isEmpty) {
       throw CFException(CFExceptionConstants.PAYMENT_SESSION_ID_NOT_PRESENT);
     }
     return CFSession(this);
@@ -73,7 +73,6 @@ class CFSession {
 
   CFSession(CFSessionBuilder sessionBuilder) {
     _environment = sessionBuilder.getEnvironment();
-    _orderToken = sessionBuilder.getOrderToken();
     _paymentSessionId = sessionBuilder.getPaymentSessionId();
     _orderId = sessionBuilder.getOrderId();
   }
@@ -91,8 +90,6 @@ class CFSession {
   }
 
   String getEnvironment() {
-    return _environment == CFEnvironment.SANDBOX
-        ? CFEnvironment.SANDBOX.name
-        : CFEnvironment.PRODUCTION.name;
+    return _environment == CFEnvironment.SANDBOX ? CFEnvironment.SANDBOX.name : CFEnvironment.PRODUCTION.name;
   }
 }
