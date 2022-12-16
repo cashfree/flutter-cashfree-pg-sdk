@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.cashfree.pg.api.CFPaymentGatewayService;
 import com.cashfree.pg.core.api.CFSession;
 import com.cashfree.pg.core.api.CFTheme;
+import com.cashfree.pg.core.api.base.CFPayment;
 import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
 import com.cashfree.pg.core.api.exception.CFException;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
@@ -102,7 +103,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .build();
 
         String version = Build.VERSION.RELEASE;
-        // cfDropCheckoutPayment.setPlatform("androidf-d-0.0.1-3.3.1-m-c-x-a-"+version);
+//        cfDropCheckoutPayment.setSourcePlatform(CFPayment.CFSourceSDK.fromString("aflt-d-2.0.0-3.3.9-m-c-x-a-"+version));
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
         gatewayService.doPayment(this.activity, cfDropCheckoutPayment);
       } catch (CFException e) {
@@ -174,11 +175,11 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
       if(environment.equals("PRODUCTION")) {
         sessionEnvironment = CFSession.Environment.PRODUCTION;
       }
-      String paymentSessionId = session.get("payment_session_id");
+      String payment_session_id = session.get("payment_session_id");
       String orderId = session.get("order_id");
       CFSession cfSession = new CFSession.CFSessionBuilder()
               .setEnvironment(sessionEnvironment)
-              .setPaymentSessionID(paymentSessionId)
+              .setPaymentSessionID(payment_session_id)
               .setOrderId(orderId)
               .build();
       return cfSession;

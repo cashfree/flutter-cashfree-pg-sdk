@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
@@ -53,22 +52,17 @@ class _MyAppState extends State<MyApp> {
   }
 
   void onError(CFErrorResponse errorResponse, String orderId) {
+    print(errorResponse.getMessage());
     print("Error while making payment");
   }
 
-  String orderId = "order_18482FRGCp8M5y2lUZJwbHecDEXiz7G";
-  String orderToken = "order_token";
-  String paymentSessionId = "session_3GP-joihoisaufhkafdkjhf-hasgdkjashdlasjhdlaksdjh-ksakdhjhasgdjashgf";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
+  String orderId = "order_70512IaQKRc6AdpN7cIz2LOG6Cj2zuj";
+  String paymentSessionId = "session_iwMrSusWUZWCHIA7u2E9C4zbUZTSCmzFtl26F-IxiMVel6v0isphUlXJAzT_wTL9mciWltqZ-YSecyKPSAi6YX0BiAkYGjSwp-NYAGdDaxPW";
+  CFEnvironment environment = CFEnvironment.SANDBOX;
 
   CFSession? createSession() {
     try {
-      CFSession session;
-      if (kIsWeb) {
-        session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setOrderToken(orderToken).build();
-      } else {
-        session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setPaymentSessionId(paymentSessionId).build();
-      }
+      var session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setPaymentSessionId(paymentSessionId).build();
       return session;
     } on CFException catch (e) {
       print(e.message);

@@ -94,7 +94,6 @@ class CFPaymentGatewayService {
     Map<String, dynamic> session = {
       "environment": cfDropCheckoutPayment.getSession().getEnvironment(),
       "order_id": cfDropCheckoutPayment.getSession().getOrderId(),
-      "order_token": cfDropCheckoutPayment.getSession().getOrderToken(),
       "payment_session_id": cfDropCheckoutPayment.getSession().getPaymentSessionId(),
     };
 
