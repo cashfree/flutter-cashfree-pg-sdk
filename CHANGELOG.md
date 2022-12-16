@@ -1,3 +1,13 @@
+## 2.0.0+3
+
+* Support for payment_session_id
+* Refer [Android](https://docs.cashfree.com/docs/android-changelog) and [iOS](https://docs.cashfree.com/docs/ios-changelog)
+
+## 0.0.2+2
+
+* Android Bu Fixes
+
+
 ## 0.0.1+1
 
 * This is the initial release of the new integration provided by Cashfree Payments.
