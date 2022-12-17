@@ -1,3 +1,7 @@
+## 2.0.1+4
+
+* iOS podspec file error fix.
+
 ## 2.0.0+3
 
 * Support for payment_session_id
