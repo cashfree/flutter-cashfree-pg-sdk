@@ -1,3 +1,7 @@
+## 2.0.2+5
+
+* Android UPI Intent pay button issue fix
+
 ## 2.0.1+4
 
 * iOS podspec file error fix.
