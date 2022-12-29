@@ -1,3 +1,8 @@
+## 2.0.3+6
+
+* Android integrity bug fix.
+* Flutter Web blank screen bug fix.
+
 ## 2.0.2+5
 
 * Android UPI Intent pay button issue fix
