@@ -56,9 +56,9 @@ class _MyAppState extends State<MyApp> {
     print("Error while making payment");
   }
 
-  String orderId = "order_18482Ja1aacidFecxp85IlNH5Y13JfK";
-  String paymentSessionId = "session_SPD1xEvoDl3cUjCJU1mn2b0aKUZo8LlUDBM0frI-JasfDGGPfBlU1xDaTaaGrlZSeM-cpWrOnwczpD08l8rnZ8OKqoy3dPxeT3wPEaQiOwTQ";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
+  String orderId = "order_779252JlVOvK34tSkyTzCAIzPNxJQRGW";
+  String paymentSessionId = "session_t0kYAZ6SDMYB2X1py6vB5PXRtolMN9Iq3rJMd5q1d0arnJKE2kd481kGYnzOI2DWphYcDS5L8ScA_VQGolljprB5uxs4HUvumFGNVxYH-QBH";
+  CFEnvironment environment = CFEnvironment.SANDBOX;
 
   CFSession? createSession() {
     try {

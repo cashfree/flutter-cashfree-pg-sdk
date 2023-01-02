@@ -130,7 +130,7 @@ class FlutterCashfreePgSdkWeb {
     var jsonObject = json.decode(data) as Map<String, dynamic>;
     var order = jsonObject["order"];
     var orderId = order["orderId"] as dynamic ?? "";
-    var message = order["errorText"] as String;
+    var message = order["errorText"] as String? ?? "";
     var transaction = jsonObject["transaction"] as dynamic;
     if(transaction != null) {
       message = transaction["txMsg"] as String ?? "";
@@ -286,7 +286,7 @@ class FlutterCashfreePgSdkWeb {
     var script = document.createElement("SCRIPT") as ScriptElement;
     if(environment == "SANDBOX") {
       script.src =
-      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js";
+      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
     } else {
       script.src =
       "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
@@ -298,7 +298,7 @@ class FlutterCashfreePgSdkWeb {
       var os = allowInterop(onSuccess);
       var of = allowInterop(onFailure);
 
-      var cfConfig = CFConfig(components: componentsToSend, pluginName: "jflt-d-2.0.0-3.3.9", onFailure: of, onSuccess: os, style: style);
+      var cfConfig = CFConfig(components: componentsToSend, pluginName: "jflt-d-2.0.3-3.3.10", onFailure: of, onSuccess: os, style: style);
       c.drop(element, cfConfig);
     });
     document.querySelector("body")?.children.add(script);
