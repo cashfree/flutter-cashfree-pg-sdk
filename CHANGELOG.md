@@ -1,3 +1,7 @@
+## 2.0.4+7
+
+* Fixed dependency missing issue in Android SDK version.
+
 ## 2.0.3+6
 
 * Android integrity bug fix.
