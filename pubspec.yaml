@@ -1,6 +1,6 @@
 name: flutter_cashfree_pg_sdk
 description: This is a new integration provided by Cashfree. If you are integrating with Cashfree PG for the first time, we recommend that you use this integration.
-version: 2.0.4+7
+version: 2.0.5+8
 homepage: https://www.cashfree.com
 repository: https://github.com/cashfree/flutter-cashfree-pg-sdk
 documentation: https://docs.cashfree.com/docs/flutter-integration
