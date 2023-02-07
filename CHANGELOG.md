@@ -1,3 +1,7 @@
+## 2.0.6+9
+
+* Android component builder bug fix.
+
 ## 2.0.5+8
 
 * Fixed iOS crash issue in recon.
