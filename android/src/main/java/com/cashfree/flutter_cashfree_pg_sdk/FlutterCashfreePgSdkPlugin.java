@@ -101,7 +101,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.3");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.6");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
