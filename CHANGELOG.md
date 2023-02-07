@@ -1,3 +1,8 @@
+## 2.0.5+8
+
+* Fixed iOS crash issue in recon.
+* Fixed iOS native OTP issue for cards.
+
 ## 2.0.4+7
 
 * Fixed dependency missing issue in Android SDK version.
