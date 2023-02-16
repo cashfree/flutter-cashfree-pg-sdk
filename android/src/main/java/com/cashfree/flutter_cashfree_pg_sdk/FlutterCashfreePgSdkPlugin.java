@@ -101,7 +101,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.6");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.7");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -116,7 +116,10 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         handleExceptions(e.getMessage());
       }
     } else {
-      result.notImplemented();
+      if(result != null) {
+        result.notImplemented();
+        result = null;
+      }
     }
   }
 
@@ -203,6 +206,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     JSONObject jsonResponse = new JSONObject(successReponse);
     if(result != null) {
       result.success(jsonResponse.toString());
+      result = null;
     }
   }
 
@@ -220,6 +224,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     JSONObject jsonObject = new JSONObject(finalMap);
     if(result != null) {
       result.success(jsonObject.toString());
+      result = null;
     }
   }
 
@@ -232,6 +237,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     JSONObject jsonObject = new JSONObject(finalMap);
     if(result != null) {
       result.success(jsonObject.toString());
+      result = null;
     }
   }
 
