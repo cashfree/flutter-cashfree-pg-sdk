@@ -1,3 +1,7 @@
+## 2.0.7+10
+
+* Multiple result call fix in Android.
+
 ## 2.0.6+9
 
 * Android component builder bug fix.
