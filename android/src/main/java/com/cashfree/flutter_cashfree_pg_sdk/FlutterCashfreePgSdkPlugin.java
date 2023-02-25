@@ -13,6 +13,7 @@ import com.cashfree.pg.core.api.base.CFPayment;
 import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
 import com.cashfree.pg.core.api.exception.CFException;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
+import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutPayment;
 import com.cashfree.pg.ui.api.CFDropCheckoutPayment;
 import com.cashfree.pg.ui.api.CFPaymentComponent;
 
@@ -101,11 +102,30 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.7");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.8");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
         gatewayService.doPayment(this.activity, cfDropCheckoutPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if (call.method.equals("doWebPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+
+        CFWebCheckoutPayment cfWebCheckoutPayment = new CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
+                .setSession(cfSession)
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.8");
+        cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfWebCheckoutPayment);
       } catch (CFException e) {
         handleExceptions(e.getMessage());
       }
@@ -118,7 +138,6 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     } else {
       if(result != null) {
         result.notImplemented();
-        result = null;
       }
     }
   }
