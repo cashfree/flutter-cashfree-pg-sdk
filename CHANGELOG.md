@@ -1,3 +1,8 @@
+## 2.0.8+11
+
+* Added webcheckout flow in Android and iOS
+* Flutter web bug fix
+
 ## 2.0.7+10
 
 * Multiple result call fix in Android.
