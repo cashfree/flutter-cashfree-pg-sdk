@@ -59,6 +59,7 @@ external Cashfree get cashfree;
 class Cashfree {
   external Cashfree(String paymentSessionId);
   external void drop(Element element, CFConfig cfConfig);
+  external void redirect();
 }
 
 @JS()
@@ -104,6 +105,10 @@ class FlutterCashfreePgSdkWeb {
       case 'doPayment':
         var arguments = call.arguments as dynamic;
         doPayment(arguments);
+        break;
+      case 'doWebPayment':
+        var arguments = call.arguments as dynamic;
+        doWebPayment(arguments);
         break;
       case "response":
         break;
@@ -188,12 +193,35 @@ class FlutterCashfreePgSdkWeb {
     }
   }
 
+  /// WEB REDIRECTION
+  void doWebPayment(dynamic arguments) {
+    var window = html.window;
+    var document = window.document;
+
+    var session = arguments["session"] as dynamic;
+
+    String environment = session["environment"] as String;
+    String paymentSessionId = session["payment_session_id"] as String;
+
+    var script = document.createElement("SCRIPT") as ScriptElement;
+    if(environment == "SANDBOX") {
+      script.src =
+      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
+    } else {
+      script.src =
+      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
+    }
+    script.onLoad.first.then((value) {
+      var c = Cashfree(paymentSessionId);
+      c.redirect();
+    });
+    document.querySelector("body")?.children.add(script);
+  }
+
   /// WEB
   void doPayment(dynamic arguments) async {
     var window = html.window;
     var document = window.document;
-    
-    print(window.navigator.userAgent);
 
     window.onHashChange.first.then((value) {
       _userCancelledTransaction();
@@ -221,9 +249,9 @@ class FlutterCashfreePgSdkWeb {
     sdkDiv.style.position = "fixed";
     sdkDiv.style.left = "50%";
     sdkDiv.style.top = "50%";
-    sdkDiv.style.width = "340px";
+    sdkDiv.style.width = "400px";
     // sdkDiv.style.minHeight = "350px";
-    sdkDiv.style.height = "70%";
+    sdkDiv.style.height = "100%";
     sdkDiv.style.maxWidth = "100%";
     sdkDiv.style.transform = "translate(-50%, -50%)";
     sdkDiv.style.overflow = "auto";
