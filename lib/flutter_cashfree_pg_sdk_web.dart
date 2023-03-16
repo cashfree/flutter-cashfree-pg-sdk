@@ -222,9 +222,11 @@ class FlutterCashfreePgSdkWeb {
     sdkDiv.style.left = "50%";
     sdkDiv.style.top = "50%";
     sdkDiv.style.width = "340px";
-    sdkDiv.style.minHeight = "350px";
+    // sdkDiv.style.minHeight = "350px";
+    sdkDiv.style.height = "70%";
     sdkDiv.style.maxWidth = "100%";
     sdkDiv.style.transform = "translate(-50%, -50%)";
+    sdkDiv.style.overflow = "auto";
     outerDiv.append(sdkDiv);
 
     /// This div element has the cross mark to close the sdk

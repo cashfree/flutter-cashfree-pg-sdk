@@ -75,9 +75,27 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                             .build()
                 }
                 let systemVersion = UIDevice.current.systemVersion
-                dropCheckoutPayment.setPlatform("iflt-d-2.0.7-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                dropCheckoutPayment.setPlatform("iflt-d-2.0.8-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(dropCheckoutPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
+        } else if method == "doWebPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            do {
+                let finalSession = try self.createSession(session: session)
+                let webCheckoutPayment = try CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
+                                .setSession(finalSession)
+                                .build()
+                let systemVersion = UIDevice.current.systemVersion
+                webCheckoutPayment.setPlatform("iflt-c-2.0.8-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
                 }

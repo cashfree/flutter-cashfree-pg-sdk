@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 
@@ -59,34 +60,65 @@ class CFPaymentGatewayService {
       throw CFException(CFExceptionConstants.CALLBACK_NOT_SET);
     }
 
-    CFDropCheckoutPayment dropCheckoutPayment = cfPayment as CFDropCheckoutPayment;
-    var data = _convertToMap(dropCheckoutPayment);
+    Map<String, dynamic> data = <String, dynamic>{};
+
+    if(cfPayment is CFDropCheckoutPayment) {
+      CFDropCheckoutPayment dropCheckoutPayment = cfPayment;
+      data = _convertToMap(dropCheckoutPayment);
+    } else if(cfPayment is CFWebCheckoutPayment) {
+      CFWebCheckoutPayment webCheckoutPayment = cfPayment;
+      data = _convertToWebCheckoutMap(webCheckoutPayment);
+    }
 
     // Create Method channel here
     MethodChannel methodChannel = const MethodChannel('flutter_cashfree_pg_sdk');
-    methodChannel.invokeMethod("doPayment", data).then((value) {
-      if(value != null) {
-        final body = json.decode(value);
-        var status = body["status"] as String;
-        switch (status) {
-          case "exception":
-            var data = body["data"] as Map<String, dynamic>;
-            _createErrorResponse(data["message"] as String, null, null, null);
-            break;
-          case "success":
-            var data = body["data"] as Map<String, dynamic>;
-            verifyPayment!(data["order_id"] as String);
-            break;
-          case "failed":
-            var data = body["data"] as Map<String, dynamic>;
-            var errorResponse = CFErrorResponse(
-                data["status"] as String, data["message"] as String,
-                data["code"] as String, data["type"] as String);
-            onError!(errorResponse, data["order_id"] as String);
-            break;
-        }
+    if(cfPayment is CFDropCheckoutPayment) {
+      methodChannel.invokeMethod("doPayment", data).then((value) {
+        responseMethod(value);
+      });
+    } else if(cfPayment is CFWebCheckoutPayment) {
+      methodChannel.invokeMethod("doWebPayment", data).then((value) {
+        responseMethod(value);
+      });
+    }
+  }
+
+  void responseMethod(dynamic value) {
+    if(value != null) {
+      final body = json.decode(value);
+      var status = body["status"] as String;
+      switch (status) {
+        case "exception":
+          var data = body["data"] as Map<String, dynamic>;
+          _createErrorResponse(data["message"] as String, null, null, null);
+          break;
+        case "success":
+          var data = body["data"] as Map<String, dynamic>;
+          verifyPayment!(data["order_id"] as String);
+          break;
+        case "failed":
+          var data = body["data"] as Map<String, dynamic>;
+          var errorResponse = CFErrorResponse(
+              data["status"] as String, data["message"] as String,
+              data["code"] as String, data["type"] as String);
+          onError!(errorResponse, data["order_id"] as String);
+          break;
       }
-    });
+    }
+  }
+
+  Map<String, dynamic> _convertToWebCheckoutMap(CFWebCheckoutPayment cfWebCheckoutPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfWebCheckoutPayment.getSession().getEnvironment(),
+      "order_id": cfWebCheckoutPayment.getSession().getOrderId(),
+      "payment_session_id": cfWebCheckoutPayment.getSession()
+          .getPaymentSessionId(),
+    };
+
+    Map<String, dynamic> data = {
+      "session": session
+    };
+    return data;
   }
 
   Map<String, dynamic> _convertToMap(CFDropCheckoutPayment cfDropCheckoutPayment) {
