@@ -1,3 +1,8 @@
+## 2.0.9+12
+
+* Added Redirect Flow in Flutter Web
+* Flutter web drop js fix
+
 ## 2.0.8+11
 
 * Added webcheckout flow in Android and iOS
