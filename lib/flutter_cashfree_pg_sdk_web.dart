@@ -135,7 +135,7 @@ class FlutterCashfreePgSdkWeb {
     var jsonObject = json.decode(data) as Map<String, dynamic>;
     var order = jsonObject["order"];
     var orderId = order["orderId"] as dynamic ?? "";
-    var message = order["errorText"] as String? ?? "";
+    var message = order["errorText"] as String? ?? (order["message"] as String? ?? "");
     var transaction = jsonObject["transaction"] as dynamic;
     if(transaction != null) {
       message = transaction["txMsg"] as String ?? "";

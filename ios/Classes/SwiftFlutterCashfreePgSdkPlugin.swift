@@ -39,11 +39,13 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
+    static var eventMethodChannel: FlutterMethodChannel?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterCashfreePgSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
+        SwiftFlutterCashfreePgSdkPlugin.eventMethodChannel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk_event", binaryMessenger: registrar.messenger())
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -75,7 +77,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                             .build()
                 }
                 let systemVersion = UIDevice.current.systemVersion
-                dropCheckoutPayment.setPlatform("iflt-d-2.0.10-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                dropCheckoutPayment.setPlatform("iflt-d-2.0.11-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(dropCheckoutPayment, viewController: vc)
                 } else {
@@ -93,7 +95,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                 .setSession(finalSession)
                                 .build()
                 let systemVersion = UIDevice.current.systemVersion
-                webCheckoutPayment.setPlatform("iflt-c-2.0.10-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                webCheckoutPayment.setPlatform("iflt-c-2.0.11-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: vc)
                 } else {
@@ -223,6 +225,16 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
             if let result = self.flutterResult {
                 result(jsonData)
             }
+        }
+    }
+    
+    public func receivedEvent(event_name: String, meta_data: Dictionary<String, Any>) {
+        if SwiftFlutterCashfreePgSdkPlugin.eventMethodChannel != nil {
+            let event = [
+                "event_name": event_name,
+                "meta_data": meta_data
+            ] as Dictionary<String, Any>
+            SwiftFlutterCashfreePgSdkPlugin.eventMethodChannel?.invokeMethod("receivedEvent", arguments: event)
         }
     }
 }

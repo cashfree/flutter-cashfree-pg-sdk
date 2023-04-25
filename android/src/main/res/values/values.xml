@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="cashfree_custom_analytics_subscriber_enabled">true</bool>
+</resources>

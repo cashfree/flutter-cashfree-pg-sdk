@@ -21,10 +21,12 @@ class CFPaymentGatewayService {
 
   static void Function(String)? verifyPayment;
   static void Function(CFErrorResponse, String)? onError;
+  static void Function(String, Map<dynamic, dynamic>)? receivedEvent;
 
-  setCallback(final void Function(String) vp, final void Function(CFErrorResponse, String) error) {
+  setCallback(final void Function(String) vp, final void Function(CFErrorResponse, String) error, [final void Function(String, Map<dynamic, dynamic>)? re]) {
     verifyPayment = vp;
     onError = error;
+    receivedEvent = re;
 
     // Create Method channel here
     MethodChannel methodChannel = const MethodChannel('flutter_cashfree_pg_sdk');
@@ -70,6 +72,11 @@ class CFPaymentGatewayService {
       data = _convertToWebCheckoutMap(webCheckoutPayment);
     }
 
+    // Method Channel for events - Start
+    MethodChannel eventChannel = const MethodChannel("flutter_cashfree_pg_sdk_event");
+    eventChannel.setMethodCallHandler(_handleMethod);
+    // Method Channel for events - End
+
     // Create Method channel here
     MethodChannel methodChannel = const MethodChannel('flutter_cashfree_pg_sdk');
     if(cfPayment is CFDropCheckoutPayment) {
@@ -80,6 +87,18 @@ class CFPaymentGatewayService {
       methodChannel.invokeMethod("doWebPayment", data).then((value) {
         responseMethod(value);
       });
+    }
+  }
+
+  Future<dynamic> _handleMethod(MethodCall call) async {
+    switch(call.method) {
+      case "receivedEvent":
+        var eventName = call.arguments["event_name"] ?? "";
+        var metaData = call.arguments["meta_data"] as Map<dynamic, dynamic>;
+        if(receivedEvent != null) {
+          receivedEvent!(eventName, metaData);
+        }
+        return null;
     }
   }
 

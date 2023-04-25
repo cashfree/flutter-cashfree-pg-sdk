@@ -1,3 +1,8 @@
+## 2.0.11+14
+
+* User events is now available in the callback methods for iOS and Android.
+* Improved error handling in Flutter Web.
+
 ## 2.0.10+13
 
 * Android Bug fix where Netbanking was shown when UPI was sent as payment component.

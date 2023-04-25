@@ -5,8 +5,11 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.cashfree.pg.api.CFPaymentGatewayService;
+import com.cashfree.pg.cf_analytics.CFAnalyticsService;
+import com.cashfree.pg.cf_analytics.CFEventsSubscriber;
 import com.cashfree.pg.core.api.CFSession;
 import com.cashfree.pg.core.api.CFTheme;
 import com.cashfree.pg.core.api.base.CFPayment;
@@ -22,6 +25,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.os.Handler;
+import android.os.Looper;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -70,13 +75,15 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
   private Result result;
-
+  private MethodChannel eventChannel;
   private Activity activity;
+  private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
   void FlutterCashfreePgSdkPlugin() {}
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    eventChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_cashfree_pg_sdk_event");
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_cashfree_pg_sdk");
     channel.setMethodCallHandler(this);
   }
@@ -85,6 +92,22 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     this.result = result;
     if (call.method.equals("doPayment")) {
+
+      CFEventsSubscriber subscriber = (eventName, metaData) -> {
+          uiThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+              if (eventChannel != null) {
+                Map<String, Object> event = new HashMap<>();
+                event.put("event_name", eventName);
+                event.put("meta_data", metaData);
+                eventChannel.invokeMethod("receivedEvent", event);
+              }
+            }
+          });
+      };
+      CFAnalyticsService.getInstance().setSubscriber(subscriber);
+
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
       Map<String, Object> paymentComponent = (Map<String, Object>) request.get("paymentComponents");
@@ -102,7 +125,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.10");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.11");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -121,7 +144,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.10");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.11");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();

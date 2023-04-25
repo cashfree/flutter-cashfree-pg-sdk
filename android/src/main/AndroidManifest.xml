@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.cashfree.flutter_cashfree_pg_sdk">
+    <application>
     <meta-data android:name="flutterEmbedding" android:value="2"/>
+    <meta-data
+        android:name="cashfree_custom_analytics_subscriber_enabled"
+        android:value="@bool/cashfree_custom_analytics_subscriber_enabled" />
+    </application>
 </manifest>
