@@ -1,3 +1,7 @@
+## 2.0.10+13
+
+* Android Bug fix where Netbanking was shown when UPI was sent as payment component.
+
 ## 2.0.9+12
 
 * Added Redirect Flow in Flutter Web
