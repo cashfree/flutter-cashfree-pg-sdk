@@ -328,7 +328,7 @@ class FlutterCashfreePgSdkWeb {
       var os = allowInterop(onSuccess);
       var of = allowInterop(onFailure);
 
-      var cfConfig = CFConfig(components: componentsToSend, pluginName: "jflt-d-2.0.10-3.3.10", onFailure: of, onSuccess: os, style: style);
+      var cfConfig = CFConfig(components: componentsToSend, pluginName: "jflt-d-2.0.12-3.3.10", onFailure: of, onSuccess: os, style: style);
       c.drop(element, cfConfig);
     });
     document.querySelector("body")?.children.add(script);

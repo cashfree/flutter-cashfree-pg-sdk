@@ -1,3 +1,9 @@
+## 2.0.12+15
+
+* User events is now available in the callback methods for iOS and Android.
+* Improved error handling in Flutter Web.
+* Bug Fixes
+
 ## 2.0.11+14
 
 * User events is now available in the callback methods for iOS and Android.

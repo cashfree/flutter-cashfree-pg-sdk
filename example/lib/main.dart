@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    cfPaymentGatewayService.setCallback(verifyPayment, onError);
+    cfPaymentGatewayService.setCallback(verifyPayment, onError, receivedEvent);
   }
 
   @override
@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   String orderId = "order_18482OugsYDr411Aj2DzDrJP8g8Q4k6";
-  String paymentSessionId = "session_ekKqFUs44YMK5KbTq56Y98Q9Zh4FtbhPT21Eovu72hdlJMathBolAJEoBB6mb8maVmZRY-x8YqBDvAPd5VgzJERvvPLEVlJcygN_RZhummjD";
+  String paymentSessionId = "session_6U02SnmsBos4Ym2QRxkLQ9dS3HiB-XeQe9C__NZxFwGtsVtGUTPVX5iA9x5EdhTPnXXZxo7NHJeBSPDSshPqSdu88_3QSbD59S4ris1BIHAv";
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
