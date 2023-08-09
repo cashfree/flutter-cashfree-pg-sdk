@@ -1,3 +1,8 @@
+## 2.0.13+16
+
+* A new version of android sdk has been added.
+* Now android users can make payment by tapping their card on the phone with the NFC feature.
+
 ## 2.0.10+13
 
 * Android Bug fix where Netbanking was shown when UPI was sent as payment component.
