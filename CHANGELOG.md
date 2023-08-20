@@ -1,3 +1,7 @@
+## 2.0.14+17
+
+* Bug Fix in android for auto read OTP.
+
 ## 2.0.13+16
 
 * A new version of android sdk has been added.
