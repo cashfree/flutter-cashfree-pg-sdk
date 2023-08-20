@@ -12,10 +12,13 @@ PODS:
   - flutter_cashfree_pg_sdk (0.0.1):
     - CashfreePG (~> 2.0.4)
     - Flutter
+  - webview_flutter_wkwebview (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_cashfree_pg_sdk (from `.symlinks/plugins/flutter_cashfree_pg_sdk/ios`)
+  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
   trunk:
@@ -30,6 +33,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_cashfree_pg_sdk:
     :path: ".symlinks/plugins/flutter_cashfree_pg_sdk/ios"
+  webview_flutter_wkwebview:
+    :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
   CashfreeAnalyticsSDK: d36845057f2f2bfda662dbe8c29a64f56805ec48
@@ -38,7 +43,8 @@ SPEC CHECKSUMS:
   CashfreePGUISDK: 0b0e1cf34a0b46a3f708d0185b98af7d4830c930
   CFNetworkSDK: fca644b42b741bd154764bc2c67d85008a9be489
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_cashfree_pg_sdk: 03b5110aa0fdbb85941c9989649742d930170cdc
+  flutter_cashfree_pg_sdk: 2d7472b992cb2f012df60ab78538d45e3e79d855
+  webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
