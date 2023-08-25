@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupiintentcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentcomponents/cfpaymentcomponent.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
@@ -27,7 +28,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    cfPaymentGatewayService.setCallback(verifyPayment, onError);
+    cfPaymentGatewayService.setCallback(verifyPayment, onError, getUPIAppsCallback);
   }
 
   @override
@@ -41,7 +42,9 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               TextButton(onPressed: pay, child: const Text("Pay")),
-              TextButton(onPressed: webCheckout, child: const Text("Web Checkout"))
+              TextButton(onPressed: webCheckout, child: const Text("Web Checkout")),
+              TextButton(onPressed: upiCheckout, child: const Text("UPI Intent Checkout")),
+              TextButton(onPressed: getInstalledUPIApps, child: const Text("Get Installed UPI Apps"))
             ],
           ),
         ),
@@ -52,19 +55,25 @@ class _MyAppState extends State<MyApp> {
   void verifyPayment(String orderId) {
     print("Verify Payment");
   }
-
+  void getUPIAppsCallback(List<Map<String, dynamic>> apps){
+    print("getUPIAppsCallback");
+    if (apps.isEmpty)
+      print("Found No Apps");
+    else
+      print("Found ${apps.length} apps in the phone");
+  }
   void onError(CFErrorResponse errorResponse, String orderId) {
     print(errorResponse.getMessage());
     print("Error while making payment");
   }
 
-  String orderId = "order_18482O5jD7mEHdKAmICEY018LuW7H8G";
-  String paymentSessionId = "session_525Lv7_RtiF7MqNjRQ28s7-wTAu7CTj0Vs3461anVHmjQNDBdRnazZDXKLsfrcIGc_QJ1Y8i1ewptbC2ibWjfzmENZPfOaqYclsMkwMnxLWI";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
+  String orderId = "Order1221321231233186";
+  String paymentSessionId = "session_bP8jq7MAaoI7RZrIGqiqGi__EKs26vbALGjvS3OW_XRwOSzF-_DsW09dJARGzh_PzXbTyXKvq90v1p-efsngy6rGJmB-mf2l3z_bg2Iud2if";
+  CFEnvironment environment = CFEnvironment.SANDBOX;
 
   CFSession? createSession() {
     try {
-      var session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setPaymentSessionId(paymentSessionId).build();
+      var session = CFSessionBuilder().setEnvironment(CFEnvironment.SANDBOX).setOrderId(orderId).setPaymentSessionId(paymentSessionId).build();
       return session;
     } on CFException catch (e) {
       print(e.message);
@@ -99,5 +108,19 @@ class _MyAppState extends State<MyApp> {
     }
 
   }
+  upiCheckout() async {
+    try {
+      var session = createSession();
+      var cfUPIIntentCheckout = CFUPIIntentCheckoutPaymentBuilder().setSession(session!).setPackage("com.google.android.apps.nbu.paisa.user").build();
+      cfPaymentGatewayService.doPayment(cfUPIIntentCheckout);
+    } on CFException catch (e) {
+      print(e.message);
+    }
 
+  }
+
+
+  void getInstalledUPIApps() async {
+    cfPaymentGatewayService.getInstalledUPIApps();
+  }
 }

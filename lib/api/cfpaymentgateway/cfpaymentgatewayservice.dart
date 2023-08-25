@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupiintentcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
@@ -21,10 +22,12 @@ class CFPaymentGatewayService {
 
   static void Function(String)? verifyPayment;
   static void Function(CFErrorResponse, String)? onError;
+  static void Function(List<Map<String, dynamic>>)? getUPIAppsCallback;
 
-  setCallback(final void Function(String) vp, final void Function(CFErrorResponse, String) error) {
+  setCallback(final void Function(String) vp, final void Function(CFErrorResponse, String) error, final void Function(List<Map<String, dynamic>>) appListCallback) {
     verifyPayment = vp;
     onError = error;
+    getUPIAppsCallback = appListCallback;
 
     // Create Method channel here
     MethodChannel methodChannel = const MethodChannel('flutter_cashfree_pg_sdk');
@@ -54,7 +57,12 @@ class CFPaymentGatewayService {
   }
 
   // TODO: take id for flutter web
-
+  getInstalledUPIApps() {
+    MethodChannel methodChannel = const MethodChannel('flutter_cashfree_pg_sdk');
+    methodChannel.invokeMethod("getInstalledUPIApps", null).then((value) {
+      responseMethod(value);
+    });
+  }
   doPayment(CFPayment cfPayment) {
     if(verifyPayment == null || onError == null) {
       throw CFException(CFExceptionConstants.CALLBACK_NOT_SET);
@@ -68,6 +76,9 @@ class CFPaymentGatewayService {
     } else if(cfPayment is CFWebCheckoutPayment) {
       CFWebCheckoutPayment webCheckoutPayment = cfPayment;
       data = _convertToWebCheckoutMap(webCheckoutPayment);
+    }else if(cfPayment is CFUPIIntentCheckoutPayment) {
+      CFUPIIntentCheckoutPayment cfupiIntentCheckoutPayment = cfPayment;
+      data = _convertToUPIIntentCheckoutMap(cfupiIntentCheckoutPayment);
     }
 
     // Create Method channel here
@@ -80,18 +91,43 @@ class CFPaymentGatewayService {
       methodChannel.invokeMethod("doWebPayment", data).then((value) {
         responseMethod(value);
       });
+    } else if(cfPayment is CFUPIIntentCheckoutPayment) {
+      methodChannel.invokeMethod("doUPIIntentPayment", data).then((value) {
+        responseMethod(value);
+      });
     }
   }
 
   void responseMethod(dynamic value) {
     if(value != null) {
-      final body = json.decode(value);
+      if (value is List) {
+        List<Map<String, dynamic>> apps = [];
+        for (var item in value) {
+          // if (item is Map<Object, Object>) {
+            Map<String, dynamic> convertedMap = {};
+            item.forEach((key, value) {
+              if (key is String) {
+                convertedMap[key] = value;
+              }
+            });
+            apps.add(convertedMap);
+          // }
+        }
+        _sendUPIAppsCallback(apps);
+        return;
+      }
+      final body = json.decode(value["data"]);
+
       var status = body["status"] as String;
       switch (status) {
         case "exception":
           var data = body["data"] as Map<String, dynamic>;
           _createErrorResponse(data["message"] as String, null, null, null);
           break;
+        // case "getUPIAppsCallback":
+        //   var data = body["data"] as List<Map<String, dynamic>>;
+        //   _sendUPIAppsCallback(data);
+        //   break;
         case "success":
           var data = body["data"] as Map<String, dynamic>;
           verifyPayment!(data["order_id"] as String);
@@ -117,6 +153,20 @@ class CFPaymentGatewayService {
 
     Map<String, dynamic> data = {
       "session": session
+    };
+    return data;
+  }
+  Map<String, dynamic> _convertToUPIIntentCheckoutMap(CFUPIIntentCheckoutPayment cfupiIntentCheckoutPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfupiIntentCheckoutPayment.getSession().getEnvironment(),
+      "order_id": cfupiIntentCheckoutPayment.getSession().getOrderId(),
+      "payment_session_id": cfupiIntentCheckoutPayment.getSession()
+          .getPaymentSessionId(),
+    };
+
+    Map<String, dynamic> data = {
+      "session": session,
+      "package": cfupiIntentCheckoutPayment.package
     };
     return data;
   }
@@ -155,5 +205,8 @@ class CFPaymentGatewayService {
   _createErrorResponse(String? message, String? code, String? type, String? orderId) {
     var cfErrorResponse = CFErrorResponse("FAILED", message ?? "something went wrong", code ?? "invalid_request", type ?? "invalid_request");
     onError!(cfErrorResponse, orderId ?? "order_id_not_found");
+  }
+  _sendUPIAppsCallback(List<Map<String, dynamic>> appsList) {
+    getUPIAppsCallback!(appsList);
   }
 }

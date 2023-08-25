@@ -1,8 +1,6 @@
 package com.cashfree.flutter_cashfree_pg_sdk;
 
 import android.app.Activity;
-import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -12,7 +10,10 @@ import com.cashfree.pg.core.api.CFTheme;
 import com.cashfree.pg.core.api.base.CFPayment;
 import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
 import com.cashfree.pg.core.api.exception.CFException;
+import com.cashfree.pg.core.api.upi.CFUPI;
+import com.cashfree.pg.core.api.upi.CFUPIPayment;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
+import com.cashfree.pg.core.api.utils.CFUPIUtil;
 import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutPayment;
 import com.cashfree.pg.ui.api.CFDropCheckoutPayment;
 import com.cashfree.pg.ui.api.CFPaymentComponent;
@@ -129,12 +130,35 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
       } catch (CFException e) {
         handleExceptions(e.getMessage());
       }
+    }  else if (call.method.equals("doUPIIntentPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      String appPackage = (String) request.get("package");
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+
+        CFUPIPayment cfupiIntentCheckoutPayment = new CFUPIPayment.CFUPIPaymentBuilder()
+                .setSession(cfSession)
+                .setCfUPI(new CFUPI.CFUPIBuilder().setMode(CFUPI.Mode.INTENT).setUPIID(appPackage).build())
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.10");
+        cfupiIntentCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfupiIntentCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfupiIntentCheckoutPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
     } else if (call.method.equals("response")) {
       try {
         CFPaymentGatewayService.getInstance().setCheckoutCallback(this);
       } catch (CFException e) {
         handleExceptions(e.getMessage());
       }
+    } else if (call.method.equals("getInstalledUPIApps")) {
+      CFUPIUtil.getInstalledUPIApps(this.activity, result::success);
     } else {
       if(result != null) {
         result.notImplemented();

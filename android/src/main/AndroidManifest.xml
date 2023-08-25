@@ -1,4 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.cashfree.flutter_cashfree_pg_sdk">
     <meta-data android:name="flutterEmbedding" android:value="2"/>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="pay"
+                android:scheme="upi" />
+        </intent>
+        <package android:name="com.android.chrome" />
+    </queries>
+
 </manifest>
