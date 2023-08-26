@@ -52,7 +52,28 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
         self.cfPaymentGatewayService.setCallback(self)
         let method = call.method
         let args = call.arguments as? Dictionary<String, Any> ?? [:]
-        if method == "doPayment" {
+        if method == "doCardPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            let card = args["card"] as? Dictionary<String, String> ?? [:]
+            do {
+                let finalSession = try self.createSession(session: session)
+                let cfCard = try self.createCard(card: card)
+                let cardPayment = try CFCardPayment.CFCardPaymentBuilder()
+                    .setCard(cfCard)
+                    .setSession(finalSession)
+                    .build()
+                let systemVersion = UIDevice.current.systemVersion
+                cardPayment.setPlatform("iflt-e-2.0.14-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doPayment(cardPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
+        } else if method == "doPayment" {
             let session = args["session"] as? Dictionary<String, String> ?? [:]
             let theme = args["theme"] as? Dictionary<String, String> ?? [:]
             let paymentComponents = args["paymentComponents"] as? Dictionary<String, AnyObject> ?? [:]
@@ -159,6 +180,22 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 .setButtonTextColor(theme["buttonTextColor"] ?? "")
                 .build()
             return cfTheme
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+    
+    private func createCard(card: Dictionary<String, String>) throws -> CFCard {
+        do {
+            let card = try CFCard.CFCardBuilder()
+                .setCVV(card["card_cvv"] ?? "")
+                .setCardNumber(card["card_number"] ?? "")
+                .setCardExpiryYear(card["card_expiry_year"] ?? "")
+                .setCardExpiryMonth(card["card_expiry_month"] ?? "")
+                .setCardHolderName(card["card_holder_name"] ?? "")
+                .build()
+            return card
         } catch let e {
             let err = e as! CashfreeError
             throw err

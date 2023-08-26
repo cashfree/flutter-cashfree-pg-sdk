@@ -11,6 +11,8 @@ import com.cashfree.pg.core.api.CFSession;
 import com.cashfree.pg.core.api.CFTheme;
 import com.cashfree.pg.core.api.base.CFPayment;
 import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
+import com.cashfree.pg.core.api.card.CFCard;
+import com.cashfree.pg.core.api.card.CFCardPayment;
 import com.cashfree.pg.core.api.exception.CFException;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
 import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutPayment;
@@ -84,7 +86,32 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     this.result = result;
-    if (call.method.equals("doPayment")) {
+    if (call.method.equals("doCardPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> card = (Map<String, String>) request.get("card");
+
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+        // Create Card
+        CFCard cfCard = createCardObject(card);
+
+        CFCardPayment cfCardPayment = new CFCardPayment.CFCardPaymentBuilder()
+                .setCard(cfCard)
+                .setSession(cfSession)
+                .setSaveCardDetail(false)
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfCardPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if (call.method.equals("doPayment")) {
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
       Map<String, Object> paymentComponent = (Map<String, Object>) request.get("paymentComponents");
@@ -187,6 +214,21 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
     CFPaymentComponent cfPaymentComponent = cfPaymentComponentBuilder.build();
     return cfPaymentComponent;
+  }
+
+  private CFCard createCardObject(Map<String, String> card) throws CFException {
+    try {
+      CFCard cfCard = new CFCard.CFCardBuilder()
+              .setCardExpiryMonth(card.get("card_expiry_month"))
+              .setCardExpiryYear(card.get("card_expiry_year"))
+              .setCardNumber(card.get("card_number"))
+              .setCardHolderName(card.get("card_holder_name"))
+              .setCVV(card.get("card_cvv"))
+              .build();
+      return cfCard;
+    } catch (CFException e) {
+      throw e;
+    }
   }
 
   private CFSession createSession(Map<String, String> session) throws CFException {

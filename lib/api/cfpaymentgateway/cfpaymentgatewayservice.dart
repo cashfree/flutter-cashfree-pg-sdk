@@ -1,13 +1,16 @@
 
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcardpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 
+import '../cfcard/cfcardwidget.dart';
 import '../cfpayment/cfpayment.dart';
 
 class CFPaymentGatewayService {
@@ -62,24 +65,30 @@ class CFPaymentGatewayService {
 
     Map<String, dynamic> data = <String, dynamic>{};
 
-    if(cfPayment is CFDropCheckoutPayment) {
-      CFDropCheckoutPayment dropCheckoutPayment = cfPayment;
-      data = _convertToMap(dropCheckoutPayment);
-    } else if(cfPayment is CFWebCheckoutPayment) {
-      CFWebCheckoutPayment webCheckoutPayment = cfPayment;
-      data = _convertToWebCheckoutMap(webCheckoutPayment);
-    }
+    if(cfPayment is CFCardPayment) {
+      CFCardPayment cfCardPayment = cfPayment;
+      _initiateCardPayment(cfCardPayment);
+    } else {
+      if (cfPayment is CFDropCheckoutPayment) {
+        CFDropCheckoutPayment dropCheckoutPayment = cfPayment;
+        data = _convertToMap(dropCheckoutPayment);
+      } else if (cfPayment is CFWebCheckoutPayment) {
+        CFWebCheckoutPayment webCheckoutPayment = cfPayment;
+        data = _convertToWebCheckoutMap(webCheckoutPayment);
+      }
 
-    // Create Method channel here
-    MethodChannel methodChannel = const MethodChannel('flutter_cashfree_pg_sdk');
-    if(cfPayment is CFDropCheckoutPayment) {
-      methodChannel.invokeMethod("doPayment", data).then((value) {
-        responseMethod(value);
-      });
-    } else if(cfPayment is CFWebCheckoutPayment) {
-      methodChannel.invokeMethod("doWebPayment", data).then((value) {
-        responseMethod(value);
-      });
+      // Create Method channel here
+      MethodChannel methodChannel = const MethodChannel(
+          'flutter_cashfree_pg_sdk');
+      if (cfPayment is CFDropCheckoutPayment) {
+        methodChannel.invokeMethod("doPayment", data).then((value) {
+          responseMethod(value);
+        });
+      } else if (cfPayment is CFWebCheckoutPayment) {
+        methodChannel.invokeMethod("doWebPayment", data).then((value) {
+          responseMethod(value);
+        });
+      }
     }
   }
 
@@ -105,6 +114,23 @@ class CFPaymentGatewayService {
           break;
       }
     }
+  }
+
+  void _initiateCardPayment(CFCardPayment cfCardPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfCardPayment.getSession().getEnvironment(),
+      "order_id": cfCardPayment.getSession().getOrderId(),
+      "payment_session_id": cfCardPayment.getSession()
+          .getPaymentSessionId(),
+    };
+    // (cfCardWidget?.key as GlobalKey<CFCardWidgetState>).currentState?.pay();
+    (cfCardPayment.getCard().getCardNumber().key as GlobalKey<CFCardWidgetState>).currentState?.completePayment(verifyPayment!,
+        onError!,
+        cfCardPayment.getCard().getCardCvv(),
+        cfCardPayment.getCard().getCardHolderName(),
+        cfCardPayment.getCard().getCardExpiryMonth(),
+        cfCardPayment.getCard().getCardExpiryYear(),
+        session);
   }
 
   Map<String, dynamic> _convertToWebCheckoutMap(CFWebCheckoutPayment cfWebCheckoutPayment) {
