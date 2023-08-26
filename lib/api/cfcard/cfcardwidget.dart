@@ -197,7 +197,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
       "card_cvv": card_cvv,
       "card_expiry_month": card_expiry_month,
       "card_expiry_year": card_expiry_year,
-      "card_number": _controller.text,
+      "card_number": _controller.text.replaceAll(' ', ''),
     };
 
     Map<String, dynamic> data = {

@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcardpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
@@ -75,6 +77,9 @@ class CFPaymentGatewayService {
       } else if (cfPayment is CFWebCheckoutPayment) {
         CFWebCheckoutPayment webCheckoutPayment = cfPayment;
         data = _convertToWebCheckoutMap(webCheckoutPayment);
+      } else if(cfPayment is CFUPIPayment) {
+        CFUPIPayment cfupiPayment = cfPayment;
+        data = _convertToUPItMap(cfupiPayment);
       }
 
       // Create Method channel here
@@ -86,6 +91,10 @@ class CFPaymentGatewayService {
         });
       } else if (cfPayment is CFWebCheckoutPayment) {
         methodChannel.invokeMethod("doWebPayment", data).then((value) {
+          responseMethod(value);
+        });
+      } else if(cfPayment is CFUPIPayment) {
+        methodChannel.invokeMethod("doUPIPayment", data).then((value) {
           responseMethod(value);
         });
       }
@@ -131,6 +140,26 @@ class CFPaymentGatewayService {
         cfCardPayment.getCard().getCardExpiryMonth(),
         cfCardPayment.getCard().getCardExpiryYear(),
         session);
+  }
+
+  Map<String, dynamic> _convertToUPItMap(CFUPIPayment cfupiPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfupiPayment.getSession().getEnvironment(),
+      "order_id": cfupiPayment.getSession().getOrderId(),
+      "payment_session_id": cfupiPayment.getSession()
+          .getPaymentSessionId(),
+    };
+
+    Map<String, String> upi = {
+      "channel": cfupiPayment.getUPI().getChannel() == CFUPIChannel.COLLECT ? "collect" : "intent",
+      "upi_id": cfupiPayment.getUPI().getUPIID(),
+    };
+
+    Map<String, dynamic> data = {
+      "session": session,
+      "upi": upi,
+    };
+    return data;
   }
 
   Map<String, dynamic> _convertToWebCheckoutMap(CFWebCheckoutPayment cfWebCheckoutPayment) {

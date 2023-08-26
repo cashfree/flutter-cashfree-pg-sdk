@@ -1,8 +1,8 @@
 package com.cashfree.flutter_cashfree_pg_sdk;
 
 import android.app.Activity;
-import android.os.Build;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -14,13 +14,18 @@ import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
 import com.cashfree.pg.core.api.card.CFCard;
 import com.cashfree.pg.core.api.card.CFCardPayment;
 import com.cashfree.pg.core.api.exception.CFException;
+import com.cashfree.pg.core.api.upi.CFUPI;
+import com.cashfree.pg.core.api.upi.CFUPIPayment;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
+import com.cashfree.pg.core.api.utils.CFUPIApp;
+import com.cashfree.pg.core.api.utils.CFUPIUtil;
 import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutPayment;
 import com.cashfree.pg.ui.api.CFDropCheckoutPayment;
 import com.cashfree.pg.ui.api.CFPaymentComponent;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +79,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   private Result result;
 
   private Activity activity;
+  private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
   void FlutterCashfreePgSdkPlugin() {}
 
@@ -86,7 +92,42 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     this.result = result;
-    if (call.method.equals("doCardPayment")) {
+    if(call.method.equals("doUPIPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> upi = (Map<String, String>) request.get("upi");
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+        // Create UPI
+        CFUPI cfupi = createUPIObject(upi);
+
+        CFUPIPayment cfupiPayment = new CFUPIPayment.CFUPIPaymentBuilder()
+                .setSession(cfSession)
+                .setCfUPI(cfupi)
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfupiPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if(call.method.equals("getupiapps")) {
+      CFUPIUtil.getInstalledUPIApps(this.activity, upiAppsList -> {
+        ArrayList<Map<String, String>> apps = new ArrayList<>();
+        for (CFUPIApp cfUPIApp: upiAppsList) {
+          apps.add(cfUPIApp.toMap());
+        }
+        uiThreadHandler.post(() -> {
+          if(result != null) {
+            result.success(apps);
+          }
+        });
+      });
+    } else if (call.method.equals("doCardPayment")) {
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
       Map<String, String> card = (Map<String, String>) request.get("card");
@@ -214,6 +255,22 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
     CFPaymentComponent cfPaymentComponent = cfPaymentComponentBuilder.build();
     return cfPaymentComponent;
+  }
+
+  private CFUPI createUPIObject(Map<String, String> upi) throws CFException {
+    try {
+      CFUPI.Mode mode = CFUPI.Mode.COLLECT;
+      if(upi.get("channel").equals("intent")) {
+        mode = CFUPI.Mode.INTENT;
+      }
+      CFUPI cfupi = new CFUPI.CFUPIBuilder()
+              .setMode(mode)
+              .setUPIID(upi.get("upi_id"))
+              .build();
+      return cfupi;
+    } catch (CFException e) {
+      throw e;
+    }
   }
 
   private CFCard createCardObject(Map<String, String> card) throws CFException {
