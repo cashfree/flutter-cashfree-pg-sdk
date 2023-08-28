@@ -8,13 +8,14 @@ import 'cfcardlistener.dart';
 class CFCardWidget extends StatefulWidget {
 
   final InputDecoration? inputDecoration;
+  final TextStyle? textStyle;
   final void Function(CFCardListener) cardListener;
 
-  const CFCardWidget({key = Key, required this.inputDecoration, required this.cardListener}): super(key: key);
+  const CFCardWidget({key = Key, required this.inputDecoration, required this.textStyle, required this.cardListener}): super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
-  State<CFCardWidget> createState() => CFCardWidgetState(inputDecoration, cardListener);
+  State<CFCardWidget> createState() => CFCardWidgetState(inputDecoration, textStyle, cardListener);
 }
 
 class CFCardWidgetState extends State<CFCardWidget> {
@@ -22,7 +23,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
   final TextEditingController _controller = TextEditingController();
   InputDecoration? _inputDecoration;
   void Function(CFCardListener)? _cardListener;
-  TextField? _cfTextField;
+  TextStyle? _textStyle;
   CFCardValidator cfCardValidator = CFCardValidator();
 
   Image _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
@@ -31,9 +32,11 @@ class CFCardWidgetState extends State<CFCardWidget> {
     fit: BoxFit.fitHeight,
   );
 
-  CFCardWidgetState(InputDecoration? inputDecoration, Function(CFCardListener) cardListener) {
+  CFCardWidgetState(InputDecoration? inputDecoration, TextStyle? textStyle, Function(CFCardListener) cardListener) {
     _inputDecoration = inputDecoration;
     _cardListener = cardListener;
+    _textStyle = textStyle;
+
   }
 
   @override
@@ -49,6 +52,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
         child: TextField(
           controller: _controller,
           keyboardType: TextInputType.number,
+          style: _textStyle,
           decoration: InputDecoration(
             icon: _inputDecoration?.icon,
             iconColor: _inputDecoration?.iconColor,

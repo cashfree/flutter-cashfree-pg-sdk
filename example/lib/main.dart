@@ -39,6 +39,7 @@ class _MyAppState extends State<MyApp> {
     cfPaymentGatewayService.setCallback(verifyPayment, onError);
     final GlobalKey<CFCardWidgetState> myWidgetKey = GlobalKey<CFCardWidgetState>();
     cfCardWidget = CFCardWidget(key: myWidgetKey,
+      textStyle: null,
       inputDecoration: InputDecoration(
       hintText: 'XXXX XXXX XXXX XXXX',
       contentPadding: const EdgeInsets.all(15.0), // Adjust padding as needed

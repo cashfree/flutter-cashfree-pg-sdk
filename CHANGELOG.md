@@ -1,3 +1,8 @@
+## 2.0.15+18
+
+* Added card widget. Now non PCI DSS compliant merchants can use the SDK to integrate card payments.
+* Added seamless upi intent and collect. Now merchants can build their own ui and make payments using the SDK for upi.
+
 ## 2.0.14+17
 
 * Bug Fix in android for auto read OTP.

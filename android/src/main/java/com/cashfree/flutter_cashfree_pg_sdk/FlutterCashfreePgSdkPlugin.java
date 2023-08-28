@@ -107,7 +107,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfUPI(cfupi)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
         cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -144,7 +144,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSaveCardDetail(false)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
         cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -170,7 +170,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -188,7 +188,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         CFWebCheckoutPayment cfWebCheckoutPayment = new CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
                 .setSession(cfSession)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
