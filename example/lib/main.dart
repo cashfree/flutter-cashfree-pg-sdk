@@ -112,8 +112,8 @@ class _MyAppState extends State<MyApp> {
     print(cardListener.getType());
   }
 
-  String orderId = "order_6032UWMu0XGXjIZiyGXTJqBzknF91p";
-  String paymentSessionId = "session_0c1FxpqEdBjn_E-EyV0J3jPQCisnzp6OmLQIQpb11F7uS37b4eMuzMAvVX7Ky12QKuBJB1czhiozeKowj7_7GG6GhOseMyMv5MMLvIkcD4Ig";
+  String orderId = "order_3242Uhv8YjD8lFe60lKOyrYOr9gd8G";
+  String paymentSessionId = "session_57HRGF7-JgG31c1A6migggZwo_02bR_LY1SZOdZigsi1px4cbX3LJAjk1q9aYtKbpeqbdjomPNykOiZA-lsgxCv1zbjeY1iTWtUBi9xngLVU";
   void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
     print(event_name);
     print(meta_data);
@@ -124,7 +124,7 @@ class _MyAppState extends State<MyApp> {
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
+  CFEnvironment environment = CFEnvironment.SANDBOX;
   String selectedId = "";
 
   upiCollectPay() async {
@@ -202,7 +202,8 @@ class _MyAppState extends State<MyApp> {
   webCheckout() async {
     try {
       var session = createSession();
-      var cfWebCheckout = CFWebCheckoutPaymentBuilder().setSession(session!).build();
+      var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#ff00ff").setNavigationBarTextColor("#ffffff").build();
+      var cfWebCheckout = CFWebCheckoutPaymentBuilder().setSession(session!).setTheme(theme).build();
       cfPaymentGatewayService.doPayment(cfWebCheckout);
     } on CFException catch (e) {
       print(e.message);

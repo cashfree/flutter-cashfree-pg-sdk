@@ -170,8 +170,20 @@ class CFPaymentGatewayService {
           .getPaymentSessionId(),
     };
 
+    Map<String, dynamic> theme = {
+      "navigationBarBackgroundColor": cfWebCheckoutPayment.getTheme().getNavigationBarBackgroundColor(),
+      "navigationBarTextColor": cfWebCheckoutPayment.getTheme().getNavigationBarTextColor(),
+      "buttonBackgroundColor": cfWebCheckoutPayment.getTheme().getButtonBackgroundColor(),
+      "buttonTextColor": cfWebCheckoutPayment.getTheme().getButtonTextColor(),
+      "primaryTextColor": cfWebCheckoutPayment.getTheme().getPrimaryTextColor(),
+      "secondaryTextColor": cfWebCheckoutPayment.getTheme().getSecondaryTextColor(),
+      "primaryFont": cfWebCheckoutPayment.getTheme().getPrimaryFont(),
+      "secondaryFont": cfWebCheckoutPayment.getTheme().getSecondaryFont()
+    };
+
     Map<String, dynamic> data = {
-      "session": session
+      "session": session,
+      "theme": theme
     };
     return data;
   }

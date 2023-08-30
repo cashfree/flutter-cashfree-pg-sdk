@@ -1,3 +1,7 @@
+## 2.0.16+19
+
+* Added CFTheme in web checkout for android
+
 ## 2.0.15+18
 
 * Added card widget. Now non PCI DSS compliant merchants can use the SDK to integrate card payments.
