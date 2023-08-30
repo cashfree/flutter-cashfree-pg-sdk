@@ -1,8 +1,8 @@
 package com.cashfree.flutter_cashfree_pg_sdk;
 
 import android.app.Activity;
-import android.os.Build;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -11,14 +11,21 @@ import com.cashfree.pg.core.api.CFSession;
 import com.cashfree.pg.core.api.CFTheme;
 import com.cashfree.pg.core.api.base.CFPayment;
 import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
+import com.cashfree.pg.core.api.card.CFCard;
+import com.cashfree.pg.core.api.card.CFCardPayment;
 import com.cashfree.pg.core.api.exception.CFException;
+import com.cashfree.pg.core.api.upi.CFUPI;
+import com.cashfree.pg.core.api.upi.CFUPIPayment;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
+import com.cashfree.pg.core.api.utils.CFUPIApp;
+import com.cashfree.pg.core.api.utils.CFUPIUtil;
 import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutPayment;
 import com.cashfree.pg.ui.api.CFDropCheckoutPayment;
 import com.cashfree.pg.ui.api.CFPaymentComponent;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +79,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   private Result result;
 
   private Activity activity;
+  private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
   void FlutterCashfreePgSdkPlugin() {}
 
@@ -84,7 +92,67 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     this.result = result;
-    if (call.method.equals("doPayment")) {
+    if(call.method.equals("doUPIPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> upi = (Map<String, String>) request.get("upi");
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+        // Create UPI
+        CFUPI cfupi = createUPIObject(upi);
+
+        CFUPIPayment cfupiPayment = new CFUPIPayment.CFUPIPaymentBuilder()
+                .setSession(cfSession)
+                .setCfUPI(cfupi)
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
+        cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfupiPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if(call.method.equals("getupiapps")) {
+      CFUPIUtil.getInstalledUPIApps(this.activity, upiAppsList -> {
+        ArrayList<Map<String, String>> apps = new ArrayList<>();
+        for (CFUPIApp cfUPIApp: upiAppsList) {
+          apps.add(cfUPIApp.toMap());
+        }
+        uiThreadHandler.post(() -> {
+          if(result != null) {
+            result.success(apps);
+          }
+        });
+      });
+    } else if (call.method.equals("doCardPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> card = (Map<String, String>) request.get("card");
+
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+        // Create Card
+        CFCard cfCard = createCardObject(card);
+
+        CFCardPayment cfCardPayment = new CFCardPayment.CFCardPaymentBuilder()
+                .setCard(cfCard)
+                .setSession(cfSession)
+                .setSaveCardDetail(false)
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
+        cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfCardPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if (call.method.equals("doPayment")) {
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
       Map<String, Object> paymentComponent = (Map<String, Object>) request.get("paymentComponents");
@@ -102,7 +170,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -120,7 +188,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         CFWebCheckoutPayment cfWebCheckoutPayment = new CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
                 .setSession(cfSession)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.14");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -187,6 +255,37 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
     CFPaymentComponent cfPaymentComponent = cfPaymentComponentBuilder.build();
     return cfPaymentComponent;
+  }
+
+  private CFUPI createUPIObject(Map<String, String> upi) throws CFException {
+    try {
+      CFUPI.Mode mode = CFUPI.Mode.COLLECT;
+      if(upi.get("channel").equals("intent")) {
+        mode = CFUPI.Mode.INTENT;
+      }
+      CFUPI cfupi = new CFUPI.CFUPIBuilder()
+              .setMode(mode)
+              .setUPIID(upi.get("upi_id"))
+              .build();
+      return cfupi;
+    } catch (CFException e) {
+      throw e;
+    }
+  }
+
+  private CFCard createCardObject(Map<String, String> card) throws CFException {
+    try {
+      CFCard cfCard = new CFCard.CFCardBuilder()
+              .setCardExpiryMonth(card.get("card_expiry_month"))
+              .setCardExpiryYear(card.get("card_expiry_year"))
+              .setCardNumber(card.get("card_number"))
+              .setCardHolderName(card.get("card_holder_name"))
+              .setCVV(card.get("card_cvv"))
+              .build();
+      return cfCard;
+    } catch (CFException e) {
+      throw e;
+    }
   }
 
   private CFSession createSession(Map<String, String> session) throws CFException {

@@ -52,7 +52,52 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
         self.cfPaymentGatewayService.setCallback(self)
         let method = call.method
         let args = call.arguments as? Dictionary<String, Any> ?? [:]
-        if method == "doPayment" {
+        if method == "doUPIPayment" {
+            do {
+                let session = args["session"] as? Dictionary<String, String> ?? [:]
+                let upi = args["upi"] as? Dictionary<String, String> ?? [:]
+                let finalSession = try self.createSession(session: session)
+                let cfupi = try self.createUPI(upi: upi)
+                let upiPayment = try CFUPIPayment.CFUPIPaymentBuilder()
+                    .setSession(finalSession)
+                    .setUPI(cfupi)
+                    .build()
+                let systemVersion = UIDevice.current.systemVersion
+                upiPayment.setPlatform("iflt-e-2.0.15-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doPayment(upiPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
+        } else if method == "getupiapps" {
+            let upiApplications = CFUPIUtils().getInstalledUPIApplications()
+            result(upiApplications)
+        } else if method == "doCardPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            let card = args["card"] as? Dictionary<String, String> ?? [:]
+            do {
+                let finalSession = try self.createSession(session: session)
+                let cfCard = try self.createCard(card: card)
+                let cardPayment = try CFCardPayment.CFCardPaymentBuilder()
+                    .setCard(cfCard)
+                    .setSession(finalSession)
+                    .build()
+                let systemVersion = UIDevice.current.systemVersion
+                cardPayment.setPlatform("iflt-e-2.0.15-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doPayment(cardPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
+        } else if method == "doPayment" {
             let session = args["session"] as? Dictionary<String, String> ?? [:]
             let theme = args["theme"] as? Dictionary<String, String> ?? [:]
             let paymentComponents = args["paymentComponents"] as? Dictionary<String, AnyObject> ?? [:]
@@ -75,7 +120,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                             .build()
                 }
                 let systemVersion = UIDevice.current.systemVersion
-                dropCheckoutPayment.setPlatform("iflt-d-2.0.14-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                dropCheckoutPayment.setPlatform("iflt-d-2.0.15-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(dropCheckoutPayment, viewController: vc)
                 } else {
@@ -93,7 +138,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                 .setSession(finalSession)
                                 .build()
                 let systemVersion = UIDevice.current.systemVersion
-                webCheckoutPayment.setPlatform("iflt-c-2.0.14-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
+                webCheckoutPayment.setPlatform("iflt-c-2.0.15-3.3.10-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: vc)
                 } else {
@@ -159,6 +204,35 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 .setButtonTextColor(theme["buttonTextColor"] ?? "")
                 .build()
             return cfTheme
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+    
+    private func createUPI(upi: Dictionary<String, String>) throws -> CFUPI {
+        do {
+            let cfUPI = try CFUPI.CFUPIBuilder()
+                .setChannel(upi["channel"] ?? "" == "collect" ? .COLLECT : .INTENT)
+                            .setUPIID(upi["upi_id"] ?? "") // Here you have to send the "id" of the app that was clicked from the list that you received earlier
+                            .build()
+            return cfUPI
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+    
+    private func createCard(card: Dictionary<String, String>) throws -> CFCard {
+        do {
+            let card = try CFCard.CFCardBuilder()
+                .setCVV(card["card_cvv"] ?? "")
+                .setCardNumber(card["card_number"] ?? "")
+                .setCardExpiryYear(card["card_expiry_year"] ?? "")
+                .setCardExpiryMonth(card["card_expiry_month"] ?? "")
+                .setCardHolderName(card["card_holder_name"] ?? "")
+                .build()
+            return card
         } catch let e {
             let err = e as! CashfreeError
             throw err
