@@ -20,6 +20,7 @@ import com.cashfree.pg.core.api.utils.CFErrorResponse;
 import com.cashfree.pg.core.api.utils.CFUPIApp;
 import com.cashfree.pg.core.api.utils.CFUPIUtil;
 import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutPayment;
+import com.cashfree.pg.core.api.webcheckout.CFWebCheckoutTheme;
 import com.cashfree.pg.ui.api.CFDropCheckoutPayment;
 import com.cashfree.pg.ui.api.CFPaymentComponent;
 
@@ -107,7 +108,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfUPI(cfupi)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.16");
         cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -144,7 +145,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSaveCardDetail(false)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.16");
         cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -170,7 +171,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.16");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -181,14 +182,17 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     } else if (call.method.equals("doWebPayment")) {
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> theme = (Map<String, String>) request.get("theme");
       try {
         // Create Session
         CFSession cfSession = createSession(session);
+        CFWebCheckoutTheme cfTheme = createWebCheckoutTheme(theme);
 
         CFWebCheckoutPayment cfWebCheckoutPayment = new CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
                 .setSession(cfSession)
+                .setCFWebCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.15");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.16");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -218,6 +222,18 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
               .setButtonTextColor(theme.get("buttonTextColor"))
               .setPrimaryTextColor(theme.get("primaryTextColor"))
               .setSecondaryTextColor(theme.get("secondaryTextColor"))
+              .build();
+      return cfTheme;
+    } catch (CFException e) {
+      throw e;
+    }
+  }
+
+  private CFWebCheckoutTheme createWebCheckoutTheme(Map<String, String> theme) throws CFException {
+    try {
+      CFWebCheckoutTheme cfTheme = new CFWebCheckoutTheme.CFWebCheckoutThemeBuilder()
+              .setNavigationBarBackgroundColor(theme.get("navigationBarBackgroundColor"))
+              .setNavigationBarTextColor(theme.get("navigationBarTextColor"))
               .build();
       return cfTheme;
     } catch (CFException e) {
