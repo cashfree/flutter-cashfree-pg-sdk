@@ -83,6 +83,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 appsToSend.append([
                     "id": upi["id"] ?? "",
                     "base64Icon": upi["icon"] ?? "",
+                    "icon": upi["icon"] ?? "",
                     "displayName": upi["displayName"] ?? ""
                 ])
             }
