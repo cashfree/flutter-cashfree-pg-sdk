@@ -75,7 +75,17 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
             }
         } else if method == "getupiapps" {
             let upiApplications = CFUPIUtils().getInstalledUPIApplications()
-            result(upiApplications)
+            var appsToSend: [NSDictionary] = []
+            for upi in upiApplications {
+                if (upi["id"] ?? "").contains("cred") {
+                    continue
+                }
+                appsToSend.append([
+                    "id": upi["id"] ?? "",
+                    "base64Icon": upi["icon"] ?? "",
+                    "displayName": upi["displayName"] ?? ""
+                ])
+            }
         } else if method == "doCardPayment" {
             let session = args["session"] as? Dictionary<String, String> ?? [:]
             let card = args["card"] as? Dictionary<String, String> ?? [:]
