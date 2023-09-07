@@ -1,3 +1,8 @@
+## 2.0.18+21
+
+* Upgraded android compile sdk version to 34
+* Key matching for android and ios in get installed upi apps
+
 ## 2.0.17+20
 
 * Upgraded android compile sdk version to 34
