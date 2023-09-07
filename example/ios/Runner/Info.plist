@@ -29,9 +29,10 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>bhim</string>
-		<string>paytm</string>
+		<string>paytmmp</string>
 		<string>phonepe</string>
 		<string>tez</string>
+        <string>credpay</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

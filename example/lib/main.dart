@@ -59,7 +59,13 @@ class _MyAppState extends State<MyApp> {
     );
 
     CFUPIUtils().getUPIApps().then((value) {
-      selectedId = value?.first["id"];
+      print(value);
+      for(var i = 0; i < (value?.length ?? 0); i++) {
+        var a = value?[i]["id"] as String ?? "";
+        if(a.contains("phonepe")) {
+          selectedId = value?[i]["id"];
+        }
+      }
     });
   }
 
@@ -112,8 +118,8 @@ class _MyAppState extends State<MyApp> {
     print(cardListener.getType());
   }
 
-  String orderId = "order_3242UhxUiidPwO0QOkPHPCgm4jkprP";
-  String paymentSessionId = "session_IHBtfcvm2qz9MXc_K2Hfc6IO_a_XExwJyAONGKbLU5fy3HR7sMDbfgSYZuSLnHmBgPtmLDY4gqumbTskfA61bDvTICXBQRB3js2MuoHi3nk2";
+  String orderId = "order_18482V2BVNtyPsu4mf0nkxloy2s9nlV";
+  String paymentSessionId = "session_u4sxFNwH9Pr4gRvmL4mxMRIXsNILzxZH1f2O2jHNw-MtrOXOrZmYxto5jfEK99g8r7kL1--uFSAnnssXkdXcpXX2jlf3WMHEKuX5OfUISDxX";
   void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
     print(event_name);
     print(meta_data);
@@ -124,7 +130,7 @@ class _MyAppState extends State<MyApp> {
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.SANDBOX;
+  CFEnvironment environment = CFEnvironment.PRODUCTION;
   String selectedId = "";
 
   upiCollectPay() async {
@@ -180,7 +186,9 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var session = CFSessionBuilder().setEnvironment(environment).setOrderId(orderId).setPaymentSessionId(paymentSessionId).build();
+      var oid = "order_18482UnPepz8Gui3n2jumplLoGR2MEF";
+      var spi = "session_rOpo7X3si7GZFf1e68eKuWwyzSfeK1EBhZC_nBBw2jNQXbzyjZW611En1TAZ93c7XSrqtDrGSOHanlS8YXP3DTDXJvN1_JP_bnU8aT0uhrka";
+      var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {
       print(e.message);
@@ -202,8 +210,8 @@ class _MyAppState extends State<MyApp> {
   webCheckout() async {
     try {
       var session = createSession();
-      //var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#ff00ff").setNavigationBarTextColor("#ffffff").build();
-      var cfWebCheckout = CFWebCheckoutPaymentBuilder().setSession(session!).build();
+      var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#ff00ff").setNavigationBarTextColor("#ffffff").build();
+      var cfWebCheckout = CFWebCheckoutPaymentBuilder().setSession(session!).setTheme(theme).build();
       cfPaymentGatewayService.doPayment(cfWebCheckout);
     } on CFException catch (e) {
       print(e.message);
