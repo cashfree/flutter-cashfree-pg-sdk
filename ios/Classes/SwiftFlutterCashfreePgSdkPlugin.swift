@@ -87,6 +87,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     "displayName": upi["displayName"] ?? ""
                 ])
             }
+            result(appsToSend)
         } else if method == "doCardPayment" {
             let session = args["session"] as? Dictionary<String, String> ?? [:]
             let card = args["card"] as? Dictionary<String, String> ?? [:]
