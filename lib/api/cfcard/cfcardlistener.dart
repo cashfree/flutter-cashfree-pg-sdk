@@ -3,9 +3,9 @@ class CFCardListener {
   int? _numberOfCharacters;
   String? _message;
   String? _type;
-  dynamic? _meta_data;
+  dynamic _meta_data;
 
-  CFCardListener(int? numberOfCharacters, String? message, String? type, dynamic? meta_data) {
+  CFCardListener(int? numberOfCharacters, String? message, String? type, dynamic meta_data) {
     _numberOfCharacters = numberOfCharacters;
     _type = type;
     _message = message;
@@ -24,7 +24,7 @@ class CFCardListener {
     return _type;
   }
 
-  dynamic? getMetaData() {
+  dynamic getMetaData() {
     return _meta_data;
   }
 

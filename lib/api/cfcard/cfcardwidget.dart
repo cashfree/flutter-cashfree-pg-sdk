@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfcard/cfcardvalidator.dart';
@@ -240,19 +238,19 @@ class CFCardWidgetState extends State<CFCardWidget> {
           switch (status) {
             case "exception":
               var data = body["data"] as Map<String, dynamic>;
-              var cfErrorResponse = CFErrorResponse("FAILED", data["message"] as String ?? "something went wrong", "invalid_request", "invalid_request");
-              onError!(cfErrorResponse, session["order_id"] ?? "order_id_not_found");
+              var cfErrorResponse = CFErrorResponse("FAILED", data["message"] as String, "invalid_request", "invalid_request");
+              onError(cfErrorResponse, session["order_id"] ?? "order_id_not_found");
               break;
             case "success":
               var data = body["data"] as Map<String, dynamic>;
-              verifyPayment!(data["order_id"] as String);
+              verifyPayment(data["order_id"] as String);
               break;
             case "failed":
               var data = body["data"] as Map<String, dynamic>;
               var errorResponse = CFErrorResponse(
                   data["status"] as String, data["message"] as String,
                   data["code"] as String, data["type"] as String);
-              onError!(errorResponse, data["order_id"] as String);
+              onError(errorResponse, data["order_id"] as String);
               break;
           }
         }
