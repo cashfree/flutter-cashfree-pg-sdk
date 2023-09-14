@@ -43,7 +43,6 @@ import 'dart:html' as html show window;
 import 'dart:html';
 import 'dart:js';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -138,7 +137,7 @@ class FlutterCashfreePgSdkWeb {
     var message = order["errorText"] as String? ?? "";
     var transaction = jsonObject["transaction"] as dynamic;
     if(transaction != null) {
-      message = transaction["txMsg"] as String ?? "";
+      message = transaction["txMsg"] as String;
       if(_onError != null) {
         var errorResponse = CFErrorResponse("FAILED", message, "invalid_request", "invalid request");
         _onError!(errorResponse, orderId);

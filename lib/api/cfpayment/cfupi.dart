@@ -1,5 +1,3 @@
-import 'package:flutter_cashfree_pg_sdk/api/cfcard/cfcardwidget.dart';
-
 enum CFUPIChannel {
   COLLECT,
   INTENT

@@ -1,10 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cashfree.flutter_cashfree_pg_sdk_example">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="flutter_cashfree_pg_sdk_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <activity
+       <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"

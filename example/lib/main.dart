@@ -38,25 +38,31 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     cfPaymentGatewayService.setCallback(verifyPayment, onError);
     final GlobalKey<CFCardWidgetState> myWidgetKey = GlobalKey<CFCardWidgetState>();
-    cfCardWidget = CFCardWidget(key: myWidgetKey,
-      textStyle: null,
-      inputDecoration: InputDecoration(
-      hintText: 'XXXX XXXX XXXX XXXX',
-      contentPadding: const EdgeInsets.all(15.0), // Adjust padding as needed
-        counterText: "",
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(5.0), // Adjust the radius as needed
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(5.0), // Adjust the radius as needed
-        borderSide: const BorderSide(
-          color: Colors.green, // Set your desired tint color here
-          width: 2.0, // Adjust the border width as needed
+    try {
+      var session = createSession();
+      cfCardWidget = CFCardWidget(key: myWidgetKey,
+        textStyle: null,
+        inputDecoration: InputDecoration(
+          hintText: 'XXXX XXXX XXXX XXXX',
+          contentPadding: const EdgeInsets.all(15.0), // Adjust padding as needed
+          counterText: "",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5.0), // Adjust the radius as needed
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5.0), // Adjust the radius as needed
+            borderSide: const BorderSide(
+              color: Colors.green, // Set your desired tint color here
+              width: 2.0, // Adjust the border width as needed
+            ),
+          ),
         ),
-      ),
-    ),
-      cardListener: cardListener,
-    );
+        cardListener: cardListener,
+        cfSession: session,
+      );
+    } on CFException catch (e) {
+      print(e.message);
+    }
 
     CFUPIUtils().getUPIApps().then((value) {
       print(value);
@@ -116,10 +122,11 @@ class _MyAppState extends State<MyApp> {
     print("Card Listener triggered");
     print(cardListener.getNumberOfCharacters());
     print(cardListener.getType());
+    print(cardListener.getMetaData());
   }
 
-  String orderId = "order_18482V2BVNtyPsu4mf0nkxloy2s9nlV";
-  String paymentSessionId = "session_u4sxFNwH9Pr4gRvmL4mxMRIXsNILzxZH1f2O2jHNw-MtrOXOrZmYxto5jfEK99g8r7kL1--uFSAnnssXkdXcpXX2jlf3WMHEKuX5OfUISDxX";
+  String orderId = "order_18482VLD2fu5pcNyxuTTUCOX1tG7arp";
+  String paymentSessionId = "session_i0HKN4QOyX6A5NV74O5lLDxwputRyO9jcM9x7RiJov_RYRjqCCL7gWPlGG16LizhbJ5dg6ZIwgZofyZQk7-LRwE0LZLqID8xQxwAZemy--Db";
   void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
     print(event_name);
     print(meta_data);

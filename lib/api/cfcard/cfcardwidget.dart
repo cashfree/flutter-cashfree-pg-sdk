@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfcard/cfcardvalidator.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfnetwork/CFNetworkManager.dart';
 import 'dart:convert';
 import '../cferrorresponse/cferrorresponse.dart';
+import '../cfsession/cfsession.dart';
 import 'cfcardlistener.dart';
 
 class CFCardWidget extends StatefulWidget {
 
   final InputDecoration? inputDecoration;
   final TextStyle? textStyle;
+  final CFSession? cfSession;
   final void Function(CFCardListener) cardListener;
 
-  const CFCardWidget({key = Key, required this.inputDecoration, required this.textStyle, required this.cardListener}): super(key: key);
+  const CFCardWidget({key = Key, required this.inputDecoration, required this.textStyle, required this.cardListener, required this.cfSession}): super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
-  State<CFCardWidget> createState() => CFCardWidgetState(inputDecoration, textStyle, cardListener);
+  State<CFCardWidget> createState() => CFCardWidgetState(inputDecoration, textStyle, cardListener, cfSession!);
 }
 
 class CFCardWidgetState extends State<CFCardWidget> {
 
   final TextEditingController _controller = TextEditingController();
+  CFSession? _cfSession;
   InputDecoration? _inputDecoration;
   void Function(CFCardListener)? _cardListener;
   TextStyle? _textStyle;
@@ -32,11 +36,11 @@ class CFCardWidgetState extends State<CFCardWidget> {
     fit: BoxFit.fitHeight,
   );
 
-  CFCardWidgetState(InputDecoration? inputDecoration, TextStyle? textStyle, Function(CFCardListener) cardListener) {
+  CFCardWidgetState(InputDecoration? inputDecoration, TextStyle? textStyle, Function(CFCardListener) cardListener, CFSession cfSession) {
     _inputDecoration = inputDecoration;
     _cardListener = cardListener;
     _textStyle = textStyle;
-
+    _cfSession = cfSession;
   }
 
   @override
@@ -114,10 +118,10 @@ class CFCardWidgetState extends State<CFCardWidget> {
     );
   }
 
-  void _handleTextChanged(String newText) {
+  Future<void> _handleTextChanged(String newText) async {
     // Remove any existing spaces from the input
     String textWithoutSpaces = newText.replaceAll(' ', '');
-    _cardListener!(CFCardListener(textWithoutSpaces.length, "", "card_length"));
+    _cardListener!(CFCardListener(textWithoutSpaces.length, "", "card_length", null));
 
     if(textWithoutSpaces.length >= 4) {
       var brand = cfCardValidator.detectCardBrand(textWithoutSpaces);
@@ -161,6 +165,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
           break;
       }
     }
+
     // Add spaces after every 4 characters
     String formattedText = '';
     for (int i = 0; i < textWithoutSpaces.length; i += 4) {
@@ -183,7 +188,21 @@ class CFCardWidgetState extends State<CFCardWidget> {
     }
     if(textWithoutSpaces.length == 16) {
       if(!cfCardValidator.luhnCheck(textWithoutSpaces)){
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "luhn check failed", "luhn_check_failed"));
+        _cardListener!(CFCardListener(textWithoutSpaces.length, "luhn check failed", "luhn_check_failed", null));
+      }
+    }
+    if(textWithoutSpaces.length == 8) {
+      var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, textWithoutSpaces);
+      var cardbinResponse = await CFNetworkManager().getCardBin(_cfSession!, textWithoutSpaces);
+      var tdrJson = {};
+      var cardbinJson = {};
+      if(tdrResponse.statusCode == 200) {
+        tdrJson = json.decode(tdrResponse.body);
+        _cardListener!(CFCardListener(textWithoutSpaces.length, "tdr information sent in the response", "tdr_response", tdrJson));
+      }
+      if(cardbinResponse.statusCode == 200) {
+        cardbinJson = jsonDecode(cardbinResponse.body);
+        _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", cardbinJson));
       }
     }
   }
@@ -219,19 +238,19 @@ class CFCardWidgetState extends State<CFCardWidget> {
           switch (status) {
             case "exception":
               var data = body["data"] as Map<String, dynamic>;
-              var cfErrorResponse = CFErrorResponse("FAILED", data["message"] as String ?? "something went wrong", "invalid_request", "invalid_request");
-              onError!(cfErrorResponse, session["order_id"] ?? "order_id_not_found");
+              var cfErrorResponse = CFErrorResponse("FAILED", data["message"] as String, "invalid_request", "invalid_request");
+              onError(cfErrorResponse, session["order_id"] ?? "order_id_not_found");
               break;
             case "success":
               var data = body["data"] as Map<String, dynamic>;
-              verifyPayment!(data["order_id"] as String);
+              verifyPayment(data["order_id"] as String);
               break;
             case "failed":
               var data = body["data"] as Map<String, dynamic>;
               var errorResponse = CFErrorResponse(
                   data["status"] as String, data["message"] as String,
                   data["code"] as String, data["type"] as String);
-              onError!(errorResponse, data["order_id"] as String);
+              onError(errorResponse, data["order_id"] as String);
               break;
           }
         }

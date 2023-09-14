@@ -1,3 +1,7 @@
+## 2.0.19+22
+
+* Added TDR and Card Bin Functionality for Card.
+
 ## 2.0.18+21
 
 * Upgraded android compile sdk version to 34
