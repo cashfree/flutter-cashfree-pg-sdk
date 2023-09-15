@@ -1,4 +1,3 @@
-import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcard.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbanking.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
