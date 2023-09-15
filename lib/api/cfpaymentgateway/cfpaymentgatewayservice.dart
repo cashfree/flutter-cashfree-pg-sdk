@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcardpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbankingpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
@@ -80,6 +81,9 @@ class CFPaymentGatewayService {
       } else if(cfPayment is CFUPIPayment) {
         CFUPIPayment cfupiPayment = cfPayment;
         data = _convertToUPItMap(cfupiPayment);
+      } else if (cfPayment is CFNetbankingPayment) {
+        CFNetbankingPayment cfNetbankingPayment = cfPayment;
+        data = _convertToNetbankingMap(cfNetbankingPayment);
       }
 
       // Create Method channel here
@@ -95,6 +99,10 @@ class CFPaymentGatewayService {
         });
       } else if(cfPayment is CFUPIPayment) {
         methodChannel.invokeMethod("doUPIPayment", data).then((value) {
+          responseMethod(value);
+        });
+      } else if (cfPayment is CFNetbankingPayment) {
+        methodChannel.invokeMethod("doNetbankingPayment", data).then((value) {
           responseMethod(value);
         });
       }
@@ -139,7 +147,28 @@ class CFPaymentGatewayService {
         cfCardPayment.getCard().getCardHolderName(),
         cfCardPayment.getCard().getCardExpiryMonth(),
         cfCardPayment.getCard().getCardExpiryYear(),
-        session);
+        session,
+        cfCardPayment.getSavePaymentMethodFlag());
+  }
+
+  Map<String, dynamic> _convertToNetbankingMap(CFNetbankingPayment cfNetbankingPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfNetbankingPayment.getSession().getEnvironment(),
+      "order_id": cfNetbankingPayment.getSession().getOrderId(),
+      "payment_session_id": cfNetbankingPayment.getSession()
+          .getPaymentSessionId(),
+    };
+
+    Map<String, String> netbanking = {
+      "channel": cfNetbankingPayment.getNetbanking().getChannel(),
+      "net_banking_code": cfNetbankingPayment.getNetbanking().getBankCode().toString(),
+    };
+
+    Map<String, dynamic> data = {
+      "session": session,
+      "net_banking": netbanking,
+    };
+    return data;
   }
 
   Map<String, dynamic> _convertToUPItMap(CFUPIPayment cfupiPayment) {

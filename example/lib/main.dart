@@ -5,6 +5,8 @@ import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcard.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcardpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbanking.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbankingpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
@@ -100,6 +102,7 @@ class _MyAppState extends State<MyApp> {
               TextButton(onPressed: cardPay, child: const Text("Card Pay")),
               TextButton(onPressed: upiCollectPay, child: const Text("UPI Collect Pay")),
               TextButton(onPressed: upiIntentPay, child: const Text("UPI Intent Pay")),
+              TextButton(onPressed: netbankingPay, child: const Text("Netbanking Pay")),
             ],
           ),
         ),
@@ -125,8 +128,8 @@ class _MyAppState extends State<MyApp> {
     print(cardListener.getMetaData());
   }
 
-  String orderId = "order_18482VLD2fu5pcNyxuTTUCOX1tG7arp";
-  String paymentSessionId = "session_i0HKN4QOyX6A5NV74O5lLDxwputRyO9jcM9x7RiJov_RYRjqCCL7gWPlGG16LizhbJ5dg6ZIwgZofyZQk7-LRwE0LZLqID8xQxwAZemy--Db";
+  String orderId = "order_3242VQtc5M7H7CchdeIBmuMmsReVVH";
+  String paymentSessionId = "session_7XQ28LqAGgbn5yriFgJQ3MBp_pZG9-8O3vGnys1DsyoGB153wiGXPNS_T1Z9p9CH8jSQRZXCfAS5V2aPlYDzp4aHaKwpVlbDtJ4FXlSGbOuN";
   void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
     print(event_name);
     print(meta_data);
@@ -137,7 +140,7 @@ class _MyAppState extends State<MyApp> {
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
+  CFEnvironment environment = CFEnvironment.SANDBOX;
   String selectedId = "";
 
   upiCollectPay() async {
@@ -146,6 +149,17 @@ class _MyAppState extends State<MyApp> {
       var upi = CFUPIBuilder().setChannel(CFUPIChannel.COLLECT).setUPIID("test@ybl").build();
       var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
+    } on CFException catch (e) {
+      print(e.message);
+    }
+  }
+
+  netbankingPay() async {
+    try {
+      var session = createSession();
+      var netbanking = CFNetbankingBuilder().setChannel("link").setBankCode(3003).build();
+      var netbankingPayment = CFNetbankingPaymentBuilder().setSession(session!).setNetbanking(netbanking).build();
+      cfPaymentGatewayService.doPayment(netbankingPayment);
     } on CFException catch (e) {
       print(e.message);
     }
@@ -193,8 +207,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var oid = "order_18482UnPepz8Gui3n2jumplLoGR2MEF";
-      var spi = "session_rOpo7X3si7GZFf1e68eKuWwyzSfeK1EBhZC_nBBw2jNQXbzyjZW611En1TAZ93c7XSrqtDrGSOHanlS8YXP3DTDXJvN1_JP_bnU8aT0uhrka";
+      var oid = "order_3242VQvK8d1Rbxuj3ZT2tQ0zLUpd8Z";
+      var spi = "session_w1B7O9Unh3ijmvot3rRLXiCvWJ4XUt-K7ehB0vggMtVd81T61mBqG098DaTEizWWF-fZRyHYj9KUudTS1PEoanTme7MOdU0q7X1iQXArLmhN";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {

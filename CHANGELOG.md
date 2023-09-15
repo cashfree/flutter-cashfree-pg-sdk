@@ -1,3 +1,8 @@
+## 2.0.20+23
+
+* Netbanking Element component in flutter
+* Save Card in Card Component
+
 ## 2.0.19+22
 
 * Added TDR and Card Bin Functionality for Card.

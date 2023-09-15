@@ -8,6 +8,7 @@ class CFCardPaymentBuilder {
 
   CFSession? _session;
   CFCard? _cfCard;
+  bool _savePaymentMethod = false;
 
   CFCardPaymentBuilder();
 
@@ -18,6 +19,11 @@ class CFCardPaymentBuilder {
 
   CFCardPaymentBuilder setCard(CFCard cfCard) {
     _cfCard = cfCard;
+    return this;
+  }
+
+  CFCardPaymentBuilder savePaymentMethod(bool flag) {
+    _savePaymentMethod = flag;
     return this;
   }
 
@@ -36,12 +42,17 @@ class CFCardPaymentBuilder {
     return _cfCard!;
   }
 
+  bool getSavePaymentMethodFlag() {
+    return _savePaymentMethod;
+  }
+
 }
 
 class CFCardPayment extends CFPayment {
 
   late CFSession _session;
   CFCard? _cfCard;
+  bool _savePaymentMethod = false;
 
   // Constructor
   CFCardPayment._();
@@ -49,6 +60,7 @@ class CFCardPayment extends CFPayment {
   CFCardPayment(CFCardPaymentBuilder builder) {
     _session = builder.getSession();
     _cfCard = builder.getCard();
+    _savePaymentMethod = builder.getSavePaymentMethodFlag();
   }
 
   CFSession getSession() {
@@ -57,5 +69,9 @@ class CFCardPayment extends CFPayment {
 
   CFCard getCard() {
     return _cfCard!;
+  }
+
+  bool getSavePaymentMethodFlag() {
+    return _savePaymentMethod;
   }
 }

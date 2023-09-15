@@ -213,7 +213,8 @@ class CFCardWidgetState extends State<CFCardWidget> {
       String card_holder_name,
       String card_expiry_month,
       String card_expiry_year,
-      Map<String, dynamic> session) {
+      Map<String, dynamic> session,
+      bool save_payment_method) {
 
     Map<String, String> card = {
       "card_holder_name": card_holder_name,
@@ -226,6 +227,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
     Map<String, dynamic> data = {
       "session": session,
       "card": card,
+      "save_payment_method": save_payment_method,
     };
 
     // Create Method channel here
