@@ -1,3 +1,7 @@
+## 2.0.21+24
+
+* Card Component GetTDR Bug Fix
+
 ## 2.0.20+23
 
 * Netbanking Element component in flutter
