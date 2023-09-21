@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
-import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:http/http.dart' as http;
 
 class CFNetworkManager {
