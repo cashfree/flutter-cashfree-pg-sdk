@@ -31,6 +31,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
   CFCardValidator cfCardValidator = CFCardValidator();
   dynamic _tdrJson = null;
   dynamic _cardbinJson = null;
+  String _first_eight_digits = "";
 
   Image _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
     width: 30,
@@ -194,6 +195,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
       }
     }
     if(textWithoutSpaces.length == 8) {
+      _first_eight_digits = textWithoutSpaces;
       var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, textWithoutSpaces);
       var cardbinResponse = await CFNetworkManager().getCardBin(_cfSession!, textWithoutSpaces);
       _tdrJson = null;
@@ -207,8 +209,28 @@ class CFCardWidgetState extends State<CFCardWidget> {
         _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", _cardbinJson));
       }
     } else if (textWithoutSpaces.length > 8) {
-      _cardListener!(CFCardListener(textWithoutSpaces.length, "tdr information sent in the response", "tdr_response", _tdrJson));
-      _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", _cardbinJson));
+      if(_first_eight_digits == textWithoutSpaces.substring(0, 8)) {
+        _cardListener!(CFCardListener(
+            textWithoutSpaces.length, "tdr information sent in the response",
+            "tdr_response", _tdrJson));
+        _cardListener!(CFCardListener(textWithoutSpaces.length,
+            "card bin information sent in the response", "card_bin_response",
+            _cardbinJson));
+      } else {
+        _first_eight_digits = textWithoutSpaces.substring(0, 8);
+        var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, _first_eight_digits);
+        var cardbinResponse = await CFNetworkManager().getCardBin(_cfSession!, _first_eight_digits);
+        _tdrJson = null;
+        _cardbinJson = null;
+        if(tdrResponse.statusCode == 200) {
+          _tdrJson = json.decode(tdrResponse.body);
+          _cardListener!(CFCardListener(textWithoutSpaces.length, "tdr information sent in the response", "tdr_response", _tdrJson));
+        }
+        if(cardbinResponse.statusCode == 200) {
+          _cardbinJson = jsonDecode(cardbinResponse.body);
+          _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", _cardbinJson));
+        }
+      }
     }
   }
 
