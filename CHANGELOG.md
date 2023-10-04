@@ -1,3 +1,7 @@
+## 2.0.22+25
+
+* Added Rupay card icon.
+
 ## 2.0.21+24
 
 * Card Component GetTDR Bug Fix

@@ -126,49 +126,6 @@ class CFCardWidgetState extends State<CFCardWidget> {
     String textWithoutSpaces = newText.replaceAll(' ', '');
     _cardListener!(CFCardListener(textWithoutSpaces.length, "", "card_length", null));
 
-    if(textWithoutSpaces.length >= 4) {
-      var brand = cfCardValidator.detectCardBrand(textWithoutSpaces);
-      switch(brand) {
-        case CFCardBrand.mastercard:
-          setState(() {
-            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/mastercard.png',
-              width: 30,
-              height: 25,
-              fit: BoxFit.fitHeight,
-            );
-          });
-          break;
-        case CFCardBrand.amex:
-          setState(() {
-            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/amex.png',
-              width: 30,
-              height: 25,
-              fit: BoxFit.fitHeight,
-            );
-          });
-          break;
-        case CFCardBrand.visa:
-          setState(() {
-            _suffixIcon =
-                Image.asset('packages/flutter_cashfree_pg_sdk/assets/visa.png',
-                  width: 30,
-                  height: 25,
-                  fit: BoxFit.fitHeight,
-                );
-          });
-          break;
-        default:
-          setState(() {
-            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
-              width: 30,
-              height: 25,
-              fit: BoxFit.fitHeight,
-            );
-          });
-          break;
-      }
-    }
-
     // Add spaces after every 4 characters
     String formattedText = '';
     for (int i = 0; i < textWithoutSpaces.length; i += 4) {
@@ -189,7 +146,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
         selection: TextSelection.collapsed(offset: formattedText.length),
       );
     }
-    if(textWithoutSpaces.length == 16) {
+    if(textWithoutSpaces.length >= 15) {
       if(!cfCardValidator.luhnCheck(textWithoutSpaces)){
         _cardListener!(CFCardListener(textWithoutSpaces.length, "luhn check failed", "luhn_check_failed", null));
       }
@@ -230,6 +187,74 @@ class CFCardWidgetState extends State<CFCardWidget> {
           _cardbinJson = jsonDecode(cardbinResponse.body);
           _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", _cardbinJson));
         }
+      }
+    }
+    if (textWithoutSpaces.length < 8) {
+      _cardbinJson = null;
+      _tdrJson = null;
+    }
+    if(_cardbinJson != null) {
+      var scheme = _cardbinJson["scheme"] as String ?? "";
+      var brand = cfCardValidator.detectCardBrand(scheme);
+      switch(brand) {
+        case CFCardBrand.mastercard:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/mastercard.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitHeight,
+            );
+          });
+          break;
+        case CFCardBrand.amex:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/amex.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitHeight,
+            );
+          });
+          break;
+        case CFCardBrand.visa:
+          setState(() {
+            _suffixIcon =
+                Image.asset('packages/flutter_cashfree_pg_sdk/assets/visa.png',
+                  width: 30,
+                  height: 25,
+                  fit: BoxFit.fitHeight,
+                );
+          });
+          break;
+        case CFCardBrand.rupay:
+          setState(() {
+            _suffixIcon =
+                Image.asset('packages/flutter_cashfree_pg_sdk/assets/rupay.png',
+                  width: 30,
+                  height: 25,
+                  fit: BoxFit.fitHeight,
+                );
+          });
+          break;
+        default:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitHeight,
+            );
+          });
+          break;
+      }
+    } else {
+      if (textWithoutSpaces.length == 7) {
+        setState(() {
+          _suffixIcon = Image.asset(
+            'packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
+            width: 30,
+            height: 25,
+            fit: BoxFit.fitHeight,
+          );
+        });
       }
     }
   }
