@@ -4,6 +4,7 @@ enum CFCardBrand {
   amex,
   discover,
   rupay,
+  jcb,
   other,
 }
 
@@ -22,6 +23,8 @@ class CFCardValidator {
   return CFCardBrand.discover;
   } else if (scheme == "rupay") {
     return CFCardBrand.rupay;
+  } else if (scheme == "jcb") {
+    return CFCardBrand.jcb;
   } else {
   return CFCardBrand.other;
   }

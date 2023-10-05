@@ -1,3 +1,7 @@
+## 2.0.23+26
+
+* Added multiple card icons.
+
 ## 2.0.22+25
 
 * Added Rupay card icon.

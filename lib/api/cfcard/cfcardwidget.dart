@@ -194,7 +194,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
       _tdrJson = null;
     }
     if(_cardbinJson != null) {
-      var scheme = _cardbinJson["scheme"] as String ?? "";
+      var scheme = _cardbinJson["scheme"] as String;
       var brand = cfCardValidator.detectCardBrand(scheme);
       switch(brand) {
         case CFCardBrand.mastercard:
@@ -202,7 +202,25 @@ class CFCardWidgetState extends State<CFCardWidget> {
             _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/mastercard.png',
               width: 30,
               height: 25,
-              fit: BoxFit.fitHeight,
+              fit: BoxFit.fitWidth,
+            );
+          });
+          break;
+        case CFCardBrand.jcb:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/jcb.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitWidth,
+            );
+          });
+          break;
+        case CFCardBrand.discover:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/discover.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitWidth,
             );
           });
           break;
@@ -211,7 +229,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
             _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/amex.png',
               width: 30,
               height: 25,
-              fit: BoxFit.fitHeight,
+              fit: BoxFit.fitWidth,
             );
           });
           break;
@@ -221,7 +239,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
                 Image.asset('packages/flutter_cashfree_pg_sdk/assets/visa.png',
                   width: 30,
                   height: 25,
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                 );
           });
           break;
@@ -231,7 +249,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
                 Image.asset('packages/flutter_cashfree_pg_sdk/assets/rupay.png',
                   width: 30,
                   height: 25,
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                 );
           });
           break;
