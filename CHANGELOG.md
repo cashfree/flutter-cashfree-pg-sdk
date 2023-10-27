@@ -1,3 +1,7 @@
+## 2.0.24+27
+
+* Changed the card listener response.
+
 ## 2.0.23+26
 
 * Added multiple card icons.

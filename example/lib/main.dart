@@ -140,13 +140,13 @@ class _MyAppState extends State<MyApp> {
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.SANDBOX;
+  CFEnvironment environment = CFEnvironment.PRODUCTION;
   String selectedId = "";
 
   upiCollectPay() async {
     try {
       var session = createSession();
-      var upi = CFUPIBuilder().setChannel(CFUPIChannel.COLLECT).setUPIID("testfailure@gocash").build();
+      var upi = CFUPIBuilder().setChannel(CFUPIChannel.COLLECT).setUPIID("suhasg6@ybl").build();
       var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
     } on CFException catch (e) {
@@ -207,8 +207,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var oid = "order_3242WKv4tB5NTHhvPxAYElJrbxdvYN";
-      var spi = "session_okeM4gpeT_4SJ4eHrtSPlgVXzSWo-iwKXPlFNq3TkQltMZx3xnYYUJUkQMo-G39SwzovrbxhCv--ofXqM2i1Ykka8T0qPSaPxFBP1tazT7q0";
+      var oid = "23OQ50003037";
+      var spi = "session_0zi6lmaV7cJl5LLXE1Ah2jMcQG8KqK53F-wh32jvorYEWojubFZnHklXNWaeYFSaE4HlQqvb1Zk6Y5R375HeFMCbquwyX09__8I1CbIovxek";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {

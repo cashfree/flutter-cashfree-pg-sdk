@@ -123,8 +123,8 @@ class CFCardWidgetState extends State<CFCardWidget> {
 
   Future<void> _handleTextChanged(String newText) async {
     // Remove any existing spaces from the input
+    var completeResponse = {};
     String textWithoutSpaces = newText.replaceAll(' ', '');
-    _cardListener!(CFCardListener(textWithoutSpaces.length, "", "card_length", null));
 
     // Add spaces after every 4 characters
     String formattedText = '';
@@ -146,11 +146,6 @@ class CFCardWidgetState extends State<CFCardWidget> {
         selection: TextSelection.collapsed(offset: formattedText.length),
       );
     }
-    if(textWithoutSpaces.length >= 15) {
-      if(!cfCardValidator.luhnCheck(textWithoutSpaces)){
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "luhn check failed", "luhn_check_failed", null));
-      }
-    }
     if(textWithoutSpaces.length == 8) {
       _first_eight_digits = textWithoutSpaces;
       var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, textWithoutSpaces);
@@ -159,20 +154,16 @@ class CFCardWidgetState extends State<CFCardWidget> {
       _cardbinJson = null;
       if(tdrResponse.statusCode == 200) {
         _tdrJson = json.decode(tdrResponse.body);
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "tdr information sent in the response", "tdr_response", _tdrJson));
+        completeResponse["tdr_info"] = _tdrJson;
       }
       if(cardbinResponse.statusCode == 200) {
         _cardbinJson = jsonDecode(cardbinResponse.body);
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", _cardbinJson));
+        completeResponse["card_bin_info"] = _cardbinJson;
       }
     } else if (textWithoutSpaces.length > 8) {
       if(_first_eight_digits == textWithoutSpaces.substring(0, 8)) {
-        _cardListener!(CFCardListener(
-            textWithoutSpaces.length, "tdr information sent in the response",
-            "tdr_response", _tdrJson));
-        _cardListener!(CFCardListener(textWithoutSpaces.length,
-            "card bin information sent in the response", "card_bin_response",
-            _cardbinJson));
+        completeResponse["tdr_info"] = _tdrJson;
+        completeResponse["card_bin_info"] = _cardbinJson;
       } else {
         _first_eight_digits = textWithoutSpaces.substring(0, 8);
         var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, _first_eight_digits);
@@ -181,11 +172,11 @@ class CFCardWidgetState extends State<CFCardWidget> {
         _cardbinJson = null;
         if(tdrResponse.statusCode == 200) {
           _tdrJson = json.decode(tdrResponse.body);
-          _cardListener!(CFCardListener(textWithoutSpaces.length, "tdr information sent in the response", "tdr_response", _tdrJson));
+          completeResponse["tdr_info"] = _tdrJson;
         }
         if(cardbinResponse.statusCode == 200) {
           _cardbinJson = jsonDecode(cardbinResponse.body);
-          _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", _cardbinJson));
+          completeResponse["card_bin_info"] = _cardbinJson;
         }
       }
     }
@@ -275,6 +266,12 @@ class CFCardWidgetState extends State<CFCardWidget> {
         });
       }
     }
+    completeResponse["luhn_check_info"] = "SUCCESS";
+    if(!cfCardValidator.luhnCheck(textWithoutSpaces)){
+      completeResponse["luhn_check_info"] = "FAIL";
+    }
+    completeResponse["card_length"] = textWithoutSpaces.length;
+    _cardListener!(CFCardListener(textWithoutSpaces.length, "This contains all the information about the card.", "card_info", completeResponse));
   }
 
   void completePayment(final void Function(String) verifyPayment,
