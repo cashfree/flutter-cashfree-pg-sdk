@@ -1,4 +1,4 @@
-# Cashfree Android SDK Sample
+# Cashfree Flutter SDK Sample
 
 ![GitHub](https://img.shields.io/github/license/cashfree/flutter-cashfree-pg-sdk) ![Discord](https://img.shields.io/discord/931125665669972018?label=discord) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/cashfree/flutter-cashfree-pg-sdk/main) ![GitHub release (with filter)](https://img.shields.io/github/v/release/cashfree/flutter-cashfree-pg-sdk?label=latest) ![Maven Central](https://img.shields.io/maven-central/v/com.cashfree.pg/api) ![GitHub forks](https://img.shields.io/github/forks/cashfree/flutter-cashfree-pg-sdk) [![Build](https://github.com/cashfree/flutter-cashfree-pg-sdk/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/cashfree/flutter-cashfree-pg-sdk/actions/workflows/main.yml) ![GitHub Repo stars](https://img.shields.io/github/stars/cashfree/flutter-cashfree-pg-sdk)
 
@@ -7,27 +7,27 @@
 
 ## **Description** 
 
-Sample integration project for Cashfree Payment Gateway's Android SDK, facilitating seamless and secure payment processing within your Android application.
+Sample integration project for Cashfree Payment Gateway's Flutter SDK, facilitating seamless and secure payment processing within your Flutter application.
 
 
 ## Documentation
 
-The Cashfree Android SDK allows you to integrate Cashfree Payment Gateway into your application and start collecting payments from your customers. It has been designed to minimise the complexity of handling and integrating payments in your Android project.
+The Cashfree Flutter SDK allows you to integrate Cashfree Payment Gateway into your application and start collecting payments from your customers. It has been designed to minimise the complexity of handling and integrating payments in your Flutter project.
 
 ### Getting Started
 
-Please replace the values for orderId, token (Payment Session ID) and environment values in the Activity class of the respective payment mode that you are trying out and run the app module.
+Please replace the values for orderId, token (Payment Session ID) and environment values in the example flutter project inside the repo and run.
 
-```kotlin
+```dart
 
-    var orderID = "ORDER_ID" // replace with actual value
-    var paymentSessionID = "PAYMENT_SESSION_ID" // replace with actual value
-    var cfEnvironment = CFSession.Environment.PRODUCTION // replace with actual value
+  // String orderId =  "ORDER_ID"; // replace with actual value
+  // String paymentSessionId =  "PAYMENT_SESSION_ID" // replace with actual value
+  CFEnvironment environment = CFEnvironment.PRODUCTION;  // replace with actual value
 
 ```
 
 
-| Please refer our official android documentation [here](https://docs.cashfree.com/docs/android-integration).
+| Please refer our official flutter documentation [here](https://docs.cashfree.com/docs/flutter-integration).
 
 
 ## Getting help
