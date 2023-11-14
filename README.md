@@ -20,8 +20,8 @@ Please replace the values for orderId, token (Payment Session ID) and environmen
 
 ```dart
 
-  // String orderId =  "ORDER_ID"; // replace with actual value
-  // String paymentSessionId =  "PAYMENT_SESSION_ID" // replace with actual value
+  String orderId =  "ORDER_ID"; // replace with actual value
+  String paymentSessionId =  "PAYMENT_SESSION_ID" // replace with actual value
   CFEnvironment environment = CFEnvironment.PRODUCTION;  // replace with actual value
 
 ```
