@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/cashfree/flutter-cashfree-pg-sdk) ![Discord](https://img.shields.io/discord/931125665669972018?label=discord) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/cashfree/flutter-cashfree-pg-sdk/main) ![GitHub release (with filter)](https://img.shields.io/github/v/release/cashfree/flutter-cashfree-pg-sdk?label=latest) ![Maven Central](https://img.shields.io/maven-central/v/com.cashfree.pg/api) ![GitHub forks](https://img.shields.io/github/forks/cashfree/flutter-cashfree-pg-sdk) [![Build](https://github.com/cashfree/flutter-cashfree-pg-sdk/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/cashfree/flutter-cashfree-pg-sdk/actions/workflows/main.yml) ![GitHub Repo stars](https://img.shields.io/github/stars/cashfree/flutter-cashfree-pg-sdk)
 
 
-![Sample Banner Image](https://maven.cashfree.com/images/github-header-image.png)
+![Sample Banner Image](https://maven.cashfree.com/images/github-header-image-flutter.png)
 
 ## **Description** 
 
