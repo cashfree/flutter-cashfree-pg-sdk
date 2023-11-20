@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    cfPaymentGatewayService.setCallback(verifyPayment, onError);
+    // cfPaymentGatewayService.setCallback(verifyPayment, onError);
     final GlobalKey<CFCardWidgetState> myWidgetKey = GlobalKey<CFCardWidgetState>();
     try {
       var session = createSession();
@@ -167,6 +167,7 @@ class _MyAppState extends State<MyApp> {
 
   upiIntentPay() async {
     try {
+      cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
       var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT).setUPIID(selectedId).build();
       var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
@@ -207,8 +208,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var oid = "23OQ50003037";
-      var spi = "session_0zi6lmaV7cJl5LLXE1Ah2jMcQG8KqK53F-wh32jvorYEWojubFZnHklXNWaeYFSaE4HlQqvb1Zk6Y5R375HeFMCbquwyX09__8I1CbIovxek";
+      var oid = "order_18482YR1LP7i1tA0nr9VcHGgOEcNVo4";
+      var spi = "session_GbXSkPNmH55MjW3YaxWMqjqX1isnOdyclFQWjtqQsJVYRb-q7KhhmlLDcI1562gAjfCxddva6-mz1rGXlYfwvT7udLdenM4U8EAu6zx-INBZ";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {

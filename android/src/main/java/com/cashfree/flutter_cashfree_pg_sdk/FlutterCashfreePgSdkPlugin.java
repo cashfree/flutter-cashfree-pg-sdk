@@ -80,6 +80,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
   private Result result;
+  private JSONObject finalResponse;
 
   private Activity activity;
   private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
@@ -227,11 +228,12 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         handleExceptions(e.getMessage());
       }
     } else if (call.method.equals("response")) {
-      try {
-        CFPaymentGatewayService.getInstance().setCheckoutCallback(this);
-      } catch (CFException e) {
-        handleExceptions(e.getMessage());
-      }
+        if(finalResponse != null) {
+          if(result != null) {
+            result.success(finalResponse.toString());
+            finalResponse = null;
+          }
+        }
     } else {
       if(result != null) {
         result.notImplemented();
@@ -377,6 +379,8 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     if(result != null) {
       result.success(jsonResponse.toString());
       result = null;
+    } else {
+      finalResponse = jsonResponse;
     }
   }
 
@@ -395,6 +399,8 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     if(result != null) {
       result.success(jsonObject.toString());
       result = null;
+    } else {
+      finalResponse = jsonObject;
     }
   }
 
