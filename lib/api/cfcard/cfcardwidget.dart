@@ -29,6 +29,9 @@ class CFCardWidgetState extends State<CFCardWidget> {
   void Function(CFCardListener)? _cardListener;
   TextStyle? _textStyle;
   CFCardValidator cfCardValidator = CFCardValidator();
+  dynamic _tdrJson = null;
+  dynamic _cardbinJson = null;
+  String _first_eight_digits = "";
 
   Image _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
     width: 30,
@@ -120,51 +123,8 @@ class CFCardWidgetState extends State<CFCardWidget> {
 
   Future<void> _handleTextChanged(String newText) async {
     // Remove any existing spaces from the input
+    var completeResponse = {};
     String textWithoutSpaces = newText.replaceAll(' ', '');
-    _cardListener!(CFCardListener(textWithoutSpaces.length, "", "card_length", null));
-
-    if(textWithoutSpaces.length >= 4) {
-      var brand = cfCardValidator.detectCardBrand(textWithoutSpaces);
-      switch(brand) {
-        case CFCardBrand.mastercard:
-          setState(() {
-            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/mastercard.png',
-              width: 30,
-              height: 25,
-              fit: BoxFit.fitHeight,
-            );
-          });
-          break;
-        case CFCardBrand.amex:
-          setState(() {
-            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/amex.png',
-              width: 30,
-              height: 25,
-              fit: BoxFit.fitHeight,
-            );
-          });
-          break;
-        case CFCardBrand.visa:
-          setState(() {
-            _suffixIcon =
-                Image.asset('packages/flutter_cashfree_pg_sdk/assets/visa.png',
-                  width: 30,
-                  height: 25,
-                  fit: BoxFit.fitHeight,
-                );
-          });
-          break;
-        default:
-          setState(() {
-            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
-              width: 30,
-              height: 25,
-              fit: BoxFit.fitHeight,
-            );
-          });
-          break;
-      }
-    }
 
     // Add spaces after every 4 characters
     String formattedText = '';
@@ -186,25 +146,132 @@ class CFCardWidgetState extends State<CFCardWidget> {
         selection: TextSelection.collapsed(offset: formattedText.length),
       );
     }
-    if(textWithoutSpaces.length == 16) {
-      if(!cfCardValidator.luhnCheck(textWithoutSpaces)){
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "luhn check failed", "luhn_check_failed", null));
-      }
-    }
     if(textWithoutSpaces.length == 8) {
+      _first_eight_digits = textWithoutSpaces;
       var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, textWithoutSpaces);
       var cardbinResponse = await CFNetworkManager().getCardBin(_cfSession!, textWithoutSpaces);
-      var tdrJson = {};
-      var cardbinJson = {};
+      _tdrJson = null;
+      _cardbinJson = null;
       if(tdrResponse.statusCode == 200) {
-        tdrJson = json.decode(tdrResponse.body);
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "tdr information sent in the response", "tdr_response", tdrJson));
+        _tdrJson = json.decode(tdrResponse.body);
+        completeResponse["tdr_info"] = _tdrJson;
       }
       if(cardbinResponse.statusCode == 200) {
-        cardbinJson = jsonDecode(cardbinResponse.body);
-        _cardListener!(CFCardListener(textWithoutSpaces.length, "card bin information sent in the response", "card_bin_response", cardbinJson));
+        _cardbinJson = jsonDecode(cardbinResponse.body);
+        completeResponse["card_bin_info"] = _cardbinJson;
+      }
+    } else if (textWithoutSpaces.length > 8) {
+      if(_first_eight_digits == textWithoutSpaces.substring(0, 8)) {
+        completeResponse["tdr_info"] = _tdrJson;
+        completeResponse["card_bin_info"] = _cardbinJson;
+      } else {
+        _first_eight_digits = textWithoutSpaces.substring(0, 8);
+        var tdrResponse = await CFNetworkManager().getTDR(_cfSession!, _first_eight_digits);
+        var cardbinResponse = await CFNetworkManager().getCardBin(_cfSession!, _first_eight_digits);
+        _tdrJson = null;
+        _cardbinJson = null;
+        if(tdrResponse.statusCode == 200) {
+          _tdrJson = json.decode(tdrResponse.body);
+          completeResponse["tdr_info"] = _tdrJson;
+        }
+        if(cardbinResponse.statusCode == 200) {
+          _cardbinJson = jsonDecode(cardbinResponse.body);
+          completeResponse["card_bin_info"] = _cardbinJson;
+        }
       }
     }
+    if (textWithoutSpaces.length < 8) {
+      _cardbinJson = null;
+      _tdrJson = null;
+    }
+    if(_cardbinJson != null) {
+      var scheme = _cardbinJson["scheme"] as String;
+      var brand = cfCardValidator.detectCardBrand(scheme);
+      switch(brand) {
+        case CFCardBrand.mastercard:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/mastercard.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitWidth,
+            );
+          });
+          break;
+        case CFCardBrand.jcb:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/jcb.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitWidth,
+            );
+          });
+          break;
+        case CFCardBrand.discover:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/discover.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitWidth,
+            );
+          });
+          break;
+        case CFCardBrand.amex:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/amex.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitWidth,
+            );
+          });
+          break;
+        case CFCardBrand.visa:
+          setState(() {
+            _suffixIcon =
+                Image.asset('packages/flutter_cashfree_pg_sdk/assets/visa.png',
+                  width: 30,
+                  height: 25,
+                  fit: BoxFit.fitWidth,
+                );
+          });
+          break;
+        case CFCardBrand.rupay:
+          setState(() {
+            _suffixIcon =
+                Image.asset('packages/flutter_cashfree_pg_sdk/assets/rupay.png',
+                  width: 30,
+                  height: 25,
+                  fit: BoxFit.fitWidth,
+                );
+          });
+          break;
+        default:
+          setState(() {
+            _suffixIcon = Image.asset('packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
+              width: 30,
+              height: 25,
+              fit: BoxFit.fitHeight,
+            );
+          });
+          break;
+      }
+    } else {
+      if (textWithoutSpaces.length == 7) {
+        setState(() {
+          _suffixIcon = Image.asset(
+            'packages/flutter_cashfree_pg_sdk/assets/credit-card-default.png',
+            width: 30,
+            height: 25,
+            fit: BoxFit.fitHeight,
+          );
+        });
+      }
+    }
+    completeResponse["luhn_check_info"] = "SUCCESS";
+    if(!cfCardValidator.luhnCheck(textWithoutSpaces)){
+      completeResponse["luhn_check_info"] = "FAIL";
+    }
+    completeResponse["card_length"] = textWithoutSpaces.length;
+    _cardListener!(CFCardListener(textWithoutSpaces.length, "This contains all the information about the card.", "card_info", completeResponse));
   }
 
   void completePayment(final void Function(String) verifyPayment,
@@ -213,7 +280,8 @@ class CFCardWidgetState extends State<CFCardWidget> {
       String card_holder_name,
       String card_expiry_month,
       String card_expiry_year,
-      Map<String, dynamic> session) {
+      Map<String, dynamic> session,
+      bool save_payment_method) {
 
     Map<String, String> card = {
       "card_holder_name": card_holder_name,
@@ -226,6 +294,7 @@ class CFCardWidgetState extends State<CFCardWidget> {
     Map<String, dynamic> data = {
       "session": session,
       "card": card,
+      "save_payment_method": save_payment_method,
     };
 
     // Create Method channel here

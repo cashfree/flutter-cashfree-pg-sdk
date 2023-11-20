@@ -15,7 +15,7 @@ class CFNetworkManager {
 
   Future<http.Response> getTDR(CFSession session, String bin) async {
     var url = "api.cashfree.com";
-    if(session.getEnvironment() == CFEnvironment.SANDBOX) {
+    if(session.getEnvironmentEnum() == CFEnvironment.SANDBOX) {
       url = "sandbox.cashfree.com";
     }
     var uri = Uri.https(url, '/pg/sdk/js/${session.getPaymentSessionId()}/v2/tdr');
@@ -30,7 +30,7 @@ class CFNetworkManager {
 
   Future<http.Response> getCardBin(CFSession session, String bin) async {
     var url = "api.cashfree.com";
-    if(session.getEnvironment() == CFEnvironment.SANDBOX) {
+    if(session.getEnvironmentEnum() == CFEnvironment.SANDBOX) {
       url = "sandbox.cashfree.com";
     }
     var uri = Uri.https(url, '/pg/sdk/js/${session.getPaymentSessionId()}/cardBin');

@@ -14,6 +14,8 @@ import com.cashfree.pg.core.api.callback.CFCheckoutResponseCallback;
 import com.cashfree.pg.core.api.card.CFCard;
 import com.cashfree.pg.core.api.card.CFCardPayment;
 import com.cashfree.pg.core.api.exception.CFException;
+import com.cashfree.pg.core.api.netbanking.CFNetBanking;
+import com.cashfree.pg.core.api.netbanking.CFNetBankingPayment;
 import com.cashfree.pg.core.api.upi.CFUPI;
 import com.cashfree.pg.core.api.upi.CFUPIPayment;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
@@ -93,7 +95,31 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     this.result = result;
-    if(call.method.equals("doUPIPayment")) {
+
+    if(call.method.equals("doNetbankingPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> netbanking = (Map<String, String>) request.get("net_banking");
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+        // Create Netbanking Object
+        CFNetBanking cfNetBanking = createNetbankingObject(netbanking);
+
+        CFNetBankingPayment cfNetBankingPayment = new CFNetBankingPayment.CFNetBankingPaymentBuilder()
+                .setSession(cfSession)
+                .setCfNetBanking(cfNetBanking)
+                .build();
+
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
+        cfNetBankingPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfNetBankingPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfNetBankingPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if(call.method.equals("doUPIPayment")) {
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
       Map<String, String> upi = (Map<String, String>) request.get("upi");
@@ -108,7 +134,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfUPI(cfupi)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.19");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
         cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -132,7 +158,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
       Map<String, Object> request = (Map<String, Object>) call.arguments;
       Map<String, String> session = (Map<String, String>) request.get("session");
       Map<String, String> card = (Map<String, String>) request.get("card");
-
+      Boolean savePaymentMethod = (Boolean) request.get("save_payment_method");
       try {
         // Create Session
         CFSession cfSession = createSession(session);
@@ -142,10 +168,10 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         CFCardPayment cfCardPayment = new CFCardPayment.CFCardPaymentBuilder()
                 .setCard(cfCard)
                 .setSession(cfSession)
-                .setSaveCardDetail(false)
+                .setSaveCardDetail(savePaymentMethod)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.19");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
         cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -171,7 +197,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.19");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -192,7 +218,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .setCFWebCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.19");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -271,6 +297,17 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
     CFPaymentComponent cfPaymentComponent = cfPaymentComponentBuilder.build();
     return cfPaymentComponent;
+  }
+
+  private CFNetBanking createNetbankingObject(Map<String, String> netbanking) throws CFException {
+    try {
+      CFNetBanking cfNetBanking = new CFNetBanking.CFNetBankingBuilder()
+              .setBankCode(Integer.parseInt(netbanking.get("net_banking_code")))
+              .build();
+      return cfNetBanking;
+    } catch (CFException e) {
+      throw e;
+    }
   }
 
   private CFUPI createUPIObject(Map<String, String> upi) throws CFException {

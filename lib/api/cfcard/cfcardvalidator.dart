@@ -3,23 +3,28 @@ enum CFCardBrand {
   mastercard,
   amex,
   discover,
+  rupay,
+  jcb,
   other,
 }
 
+// Detect Card Brand through API
+
 class CFCardValidator {
 
-  CFCardBrand detectCardBrand(String cardNumber) {
-  // Remove any spaces or dashes from the card number
-  cardNumber = cardNumber.replaceAll(RegExp(r'[-\s]'), '');
-
-  if (RegExp(r'^4[0-9]{12}(?:[0-9]{3})?$').hasMatch(cardNumber)) {
+  CFCardBrand detectCardBrand(String scheme) {
+  if (scheme == "visa") {
   return CFCardBrand.visa;
-  } else if (RegExp(r'^5[1-5][0-9]{14}$').hasMatch(cardNumber)) {
+  } else if (scheme == "mastercard") {
   return CFCardBrand.mastercard;
-  } else if (RegExp(r'^3[47][0-9]{13}$').hasMatch(cardNumber)) {
+  } else if (scheme == "amex") {
   return CFCardBrand.amex;
-  } else if (RegExp(r'^6(?:011|5[0-9]{2})[0-9]{12}$').hasMatch(cardNumber)) {
+  } else if (scheme == "discover") {
   return CFCardBrand.discover;
+  } else if (scheme == "rupay") {
+    return CFCardBrand.rupay;
+  } else if (scheme == "jcb") {
+    return CFCardBrand.jcb;
   } else {
   return CFCardBrand.other;
   }

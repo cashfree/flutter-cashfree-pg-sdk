@@ -1,3 +1,24 @@
+## 2.0.24+27
+
+* Changed the card listener response.
+
+## 2.0.23+26
+
+* Added multiple card icons.
+
+## 2.0.22+25
+
+* Added Rupay card icon.
+
+## 2.0.21+24
+
+* Card Component GetTDR Bug Fix
+
+## 2.0.20+23
+
+* Netbanking Element component in flutter
+* Save Card in Card Component
+
 ## 2.0.19+22
 
 * Added TDR and Card Bin Functionality for Card.

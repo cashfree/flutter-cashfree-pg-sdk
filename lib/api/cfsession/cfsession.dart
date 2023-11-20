@@ -92,4 +92,8 @@ class CFSession {
   String getEnvironment() {
     return _environment == CFEnvironment.SANDBOX ? CFEnvironment.SANDBOX.name : CFEnvironment.PRODUCTION.name;
   }
+
+  CFEnvironment getEnvironmentEnum() {
+    return _environment;
+  }
 }

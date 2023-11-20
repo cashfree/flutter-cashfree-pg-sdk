@@ -1,6 +1,6 @@
 name: flutter_cashfree_pg_sdk
 description: This is a new integration provided by Cashfree. If you are integrating with Cashfree PG for the first time, we recommend that you use this integration.
-version: 2.0.19+22
+version: 2.0.24+27
 homepage: https://www.cashfree.com
 repository: https://github.com/cashfree/flutter-cashfree-pg-sdk
 documentation: https://docs.cashfree.com/docs/flutter-integration
@@ -55,6 +55,11 @@ flutter:
     - assets/credit-card-default.png
     - assets/visa.png
     - assets/mastercard.png
+    - assets/rupay.png
+    - assets/diners.png
+    - assets/discover.png
+    - assets/jcb.png
+    - assets/maestro.png
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages
