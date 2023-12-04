@@ -1,3 +1,7 @@
+## 2.0.26+29
+
+* Now the SDK supports making payments with saved cards.
+
 ## 2.0.25+28
 
 * Screen restart issue handle in Android SDK.

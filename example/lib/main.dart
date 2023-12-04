@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // cfPaymentGatewayService.setCallback(verifyPayment, onError);
+    cfPaymentGatewayService.setCallback(verifyPayment, onError);
     final GlobalKey<CFCardWidgetState> myWidgetKey = GlobalKey<CFCardWidgetState>();
     try {
       var session = createSession();
@@ -179,9 +179,10 @@ class _MyAppState extends State<MyApp> {
 
   cardPay() async {
     try {
+      cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
-      var card = CFCardBuilder().setCardWidget(cfCardWidget!).setCardCVV("123").setCardExpiryMonth("12").setCardExpiryYear("25").setCardHolderName("Test").build();
-      var cardPayment = CFCardPaymentBuilder().setSession(session!).setCard(card).build();
+      var card = CFCardBuilder().setCardWidget(cfCardWidget!).setInstrumentId("db178aff-b8cf-420e-b0ba-7af89f0d2263").setCardCVV("123").setCardExpiryMonth("12").setCardExpiryYear("25").setCardHolderName("Test").build();
+      var cardPayment = CFCardPaymentBuilder().setSession(session!).setCard(card).savePaymentMethod(true).build();
       cfPaymentGatewayService.doPayment(cardPayment);
     } on CFException catch (e) {
       print(e.message);
@@ -208,8 +209,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var oid = "order_18482YR1LP7i1tA0nr9VcHGgOEcNVo4";
-      var spi = "session_GbXSkPNmH55MjW3YaxWMqjqX1isnOdyclFQWjtqQsJVYRb-q7KhhmlLDcI1562gAjfCxddva6-mz1rGXlYfwvT7udLdenM4U8EAu6zx-INBZ";
+      var oid = "order_18482Z3yahpNX76G8dp4J2yO7weUaDC";
+      var spi = "session_TyoIOf27EMGDBbHyd9VwbPKHkJRXxV7Fz3oihsyni2oH55iNx9dv3d1ll3aZgZ-xBKEXOYOE1l_z6red42QB2q4LMqZIhhxWBJ8S0Vcr2ZL7";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {

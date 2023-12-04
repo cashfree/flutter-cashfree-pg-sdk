@@ -281,15 +281,25 @@ class CFCardWidgetState extends State<CFCardWidget> {
       String card_expiry_month,
       String card_expiry_year,
       Map<String, dynamic> session,
-      bool save_payment_method) {
+      bool save_payment_method,
+      String? instrument_id) {
 
-    Map<String, String> card = {
-      "card_holder_name": card_holder_name,
-      "card_cvv": card_cvv,
-      "card_expiry_month": card_expiry_month,
-      "card_expiry_year": card_expiry_year,
-      "card_number": _controller.text.replaceAll(' ', ''),
-    };
+    Map<String, String> card = {};
+
+    if(instrument_id != null) {
+      card = {
+        "instrument_id": instrument_id,
+        "card_cvv": card_cvv,
+      };
+    } else {
+      card = {
+        "card_holder_name": card_holder_name,
+        "card_cvv": card_cvv,
+        "card_expiry_month": card_expiry_month,
+        "card_expiry_year": card_expiry_year,
+        "card_number": _controller.text.replaceAll(' ', ''),
+      };
+    }
 
     Map<String, dynamic> data = {
       "session": session,

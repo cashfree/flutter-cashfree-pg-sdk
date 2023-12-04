@@ -148,7 +148,8 @@ class CFPaymentGatewayService {
         cfCardPayment.getCard().getCardExpiryMonth(),
         cfCardPayment.getCard().getCardExpiryYear(),
         session,
-        cfCardPayment.getSavePaymentMethodFlag());
+        cfCardPayment.getSavePaymentMethodFlag(),
+        cfCardPayment.getCard().getInstrumentId());
   }
 
   Map<String, dynamic> _convertToNetbankingMap(CFNetbankingPayment cfNetbankingPayment) {

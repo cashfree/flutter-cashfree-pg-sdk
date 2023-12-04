@@ -63,7 +63,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .setNetbanking(cfnetbanking)
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
-                netbankingPayment.setPlatform("iflt-e-2.0.24-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                netbankingPayment.setPlatform("iflt-e-2.0.26-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(netbankingPayment, viewController: vc)
                 } else {
@@ -84,7 +84,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .setUPI(cfupi)
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
-                upiPayment.setPlatform("iflt-e-2.0.24-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                upiPayment.setPlatform("iflt-e-2.0.26-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(upiPayment, viewController: vc)
                 } else {
@@ -122,7 +122,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .saveInstrument(savePaymentMethod)
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
-                cardPayment.setPlatform("iflt-e-2.0.24-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                cardPayment.setPlatform("iflt-e-2.0.26-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(cardPayment, viewController: vc)
                 } else {
@@ -155,7 +155,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                             .build()
                 }
                 let systemVersion = UIDevice.current.systemVersion
-                dropCheckoutPayment.setPlatform("iflt-d-2.0.24-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                dropCheckoutPayment.setPlatform("iflt-d-2.0.26-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(dropCheckoutPayment, viewController: vc)
                 } else {
@@ -173,7 +173,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                 .setSession(finalSession)
                                 .build()
                 let systemVersion = UIDevice.current.systemVersion
-                webCheckoutPayment.setPlatform("iflt-c-2.0.24-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                webCheckoutPayment.setPlatform("iflt-c-2.0.26-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
                 if let vc = UIApplication.shared.delegate?.window??.rootViewController {
                     try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: vc)
                 } else {
@@ -272,14 +272,22 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private func createCard(card: Dictionary<String, String>) throws -> CFCard {
         do {
-            let card = try CFCard.CFCardBuilder()
-                .setCVV(card["card_cvv"] ?? "")
-                .setCardNumber(card["card_number"] ?? "")
-                .setCardExpiryYear(card["card_expiry_year"] ?? "")
-                .setCardExpiryMonth(card["card_expiry_month"] ?? "")
-                .setCardHolderName(card["card_holder_name"] ?? "")
-                .build()
-            return card
+            var cardObject: CFCard!
+            if card["instrument_id"] != nil && card["instrument_id"] != "" {
+                cardObject = try CFCard.CFCardBuilder()
+                    .setCVV(card["card_cvv"] ?? "")
+                    .setInstrumentId(card["instrument_id"] ?? "")
+                    .build()
+            } else {
+                cardObject = try CFCard.CFCardBuilder()
+                    .setCVV(card["card_cvv"] ?? "")
+                    .setCardNumber(card["card_number"] ?? "")
+                    .setCardExpiryYear(card["card_expiry_year"] ?? "")
+                    .setCardExpiryMonth(card["card_expiry_month"] ?? "")
+                    .setCardHolderName(card["card_holder_name"] ?? "")
+                    .build()
+            }
+            return cardObject
         } catch let e {
             let err = e as! CashfreeError
             throw err
