@@ -80,6 +80,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
   private Result result;
+  private JSONObject finalResponse;
 
   private Activity activity;
   private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
@@ -111,7 +112,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfNetBanking(cfNetBanking)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.26");
         cfNetBankingPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfNetBankingPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -134,7 +135,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfUPI(cfupi)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.26");
         cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -171,7 +172,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSaveCardDetail(savePaymentMethod)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.26");
         cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -197,7 +198,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.26");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -218,7 +219,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .setCFWebCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.24");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.0.26");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -227,11 +228,12 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         handleExceptions(e.getMessage());
       }
     } else if (call.method.equals("response")) {
-      try {
-        CFPaymentGatewayService.getInstance().setCheckoutCallback(this);
-      } catch (CFException e) {
-        handleExceptions(e.getMessage());
-      }
+        if(finalResponse != null) {
+          if(result != null) {
+            result.success(finalResponse.toString());
+            finalResponse = null;
+          }
+        }
     } else {
       if(result != null) {
         result.notImplemented();
@@ -328,13 +330,21 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
   private CFCard createCardObject(Map<String, String> card) throws CFException {
     try {
-      CFCard cfCard = new CFCard.CFCardBuilder()
-              .setCardExpiryMonth(card.get("card_expiry_month"))
-              .setCardExpiryYear(card.get("card_expiry_year"))
-              .setCardNumber(card.get("card_number"))
-              .setCardHolderName(card.get("card_holder_name"))
-              .setCVV(card.get("card_cvv"))
-              .build();
+      CFCard cfCard;
+      if(card.get("instrument_id") != null) {
+        cfCard = new CFCard.CFCardBuilder()
+                .setInstrumentId(card.get("instrument_id"))
+                .setCVV(card.get("card_cvv"))
+                .build();
+      } else {
+        cfCard = new CFCard.CFCardBuilder()
+                .setCardExpiryMonth(card.get("card_expiry_month"))
+                .setCardExpiryYear(card.get("card_expiry_year"))
+                .setCardNumber(card.get("card_number"))
+                .setCardHolderName(card.get("card_holder_name"))
+                .setCVV(card.get("card_cvv"))
+                .build();
+      }
       return cfCard;
     } catch (CFException e) {
       throw e;
@@ -377,6 +387,8 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     if(result != null) {
       result.success(jsonResponse.toString());
       result = null;
+    } else {
+      finalResponse = jsonResponse;
     }
   }
 
@@ -395,6 +407,8 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     if(result != null) {
       result.success(jsonObject.toString());
       result = null;
+    } else {
+      finalResponse = jsonObject;
     }
   }
 

@@ -6,6 +6,7 @@ class CFCardBuilder {
   String? _card_expiry_year;
   String? _card_cvv;
   String? _card_holder_name;
+  String? _instrument_id;
   CFCardWidget? _card_widget;
 
   CFCardBuilder();
@@ -35,6 +36,11 @@ class CFCardBuilder {
     return this;
   }
 
+  CFCardBuilder setInstrumentId(String instrument_id) {
+    _instrument_id = instrument_id;
+    return this;
+  }
+
   String getCardExpiryMonth() {
     return _card_expiry_month!;
   }
@@ -55,6 +61,10 @@ class CFCardBuilder {
     return _card_widget!;
   }
 
+  String? getInstrumentId() {
+    return _instrument_id;
+  }
+
   CFCard build() {
     return CFCard(this);
   }
@@ -67,6 +77,7 @@ class CFCard {
   String? _card_expiry_year;
   String? _card_cvv;
   String? _card_holder_name;
+  String? _instrument_id;
   CFCardWidget? _card_widget;
 
   // Constructor
@@ -78,6 +89,11 @@ class CFCard {
     _card_cvv = builder.getCardCvv();
     _card_holder_name = builder.getCardHolderName();
     _card_widget = builder.getCardNumber();
+    _instrument_id = builder.getInstrumentId();
+  }
+
+  String? getInstrumentId() {
+    return _instrument_id;
   }
 
   String getCardExpiryMonth() {
