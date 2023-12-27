@@ -42,23 +42,23 @@ class CFCardBuilder {
   }
 
   String getCardExpiryMonth() {
-    return _card_expiry_month!;
+    return _card_expiry_month ?? "";
   }
 
   String getCardExpiryYear() {
-    return _card_expiry_year!;
+    return _card_expiry_year ?? "";
   }
 
   String getCardCvv() {
-    return _card_cvv!;
+    return _card_cvv ?? "";
   }
 
   String getCardHolderName() {
-    return _card_holder_name!;
+    return _card_holder_name ?? "";
   }
 
-  CFCardWidget getCardNumber() {
-    return _card_widget!;
+  CFCardWidget? getCardNumber() {
+    return _card_widget;
   }
 
   String? getInstrumentId() {
@@ -97,23 +97,23 @@ class CFCard {
   }
 
   String getCardExpiryMonth() {
-    return _card_expiry_month!;
+    return _card_expiry_month ?? "";
   }
 
   String getCardExpiryYear() {
-    return _card_expiry_year!;
+    return _card_expiry_year ?? "";
   }
 
   String getCardCvv() {
-    return _card_cvv!;
+    return _card_cvv ?? "";
   }
 
   String getCardHolderName() {
-    return _card_holder_name!;
+    return _card_holder_name ?? "";
   }
 
-  CFCardWidget getCardNumber() {
-    return _card_widget!;
+  CFCardWidget? getCardNumber() {
+    return _card_widget;
   }
 
 }
