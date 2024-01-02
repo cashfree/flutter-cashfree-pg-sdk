@@ -1,3 +1,7 @@
+## 2.1.1+31
+
+* Addressed namespace build issue with Android CompileSdk 34.
+
 ## 2.1.0+30
 
 * Android SDK updated to 2.1.6
