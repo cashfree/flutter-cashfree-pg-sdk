@@ -22,6 +22,8 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+
+    namespace "com.cashfree.flutter_cashfree_pg_sdk"
     compileSdkVersion 34
 
     compileOptions {
