@@ -140,16 +140,77 @@ class CFPaymentGatewayService {
       "payment_session_id": cfCardPayment.getSession()
           .getPaymentSessionId(),
     };
-    // (cfCardWidget?.key as GlobalKey<CFCardWidgetState>).currentState?.pay();
-    (cfCardPayment.getCard().getCardNumber().key as GlobalKey<CFCardWidgetState>).currentState?.completePayment(verifyPayment!,
-        onError!,
-        cfCardPayment.getCard().getCardCvv(),
-        cfCardPayment.getCard().getCardHolderName(),
-        cfCardPayment.getCard().getCardExpiryMonth(),
-        cfCardPayment.getCard().getCardExpiryYear(),
-        session,
-        cfCardPayment.getSavePaymentMethodFlag(),
-        cfCardPayment.getCard().getInstrumentId());
+
+    if(cfCardPayment.getCard().getCardNumber() != null) {
+      (cfCardPayment
+          .getCard()
+          .getCardNumber()
+          ?.key as GlobalKey<CFCardWidgetState>).currentState?.completePayment(
+          verifyPayment!,
+          onError!,
+          cfCardPayment.getCard().getCardCvv(),
+          cfCardPayment.getCard().getCardHolderName(),
+          cfCardPayment.getCard().getCardExpiryMonth(),
+          cfCardPayment.getCard().getCardExpiryYear(),
+          session,
+          cfCardPayment.getSavePaymentMethodFlag(),
+          cfCardPayment.getCard().getInstrumentId());
+    } else {
+      _completePaymentWithInstrumentId(
+          verifyPayment!,
+          onError!,
+          cfCardPayment.getCard().getCardCvv(),
+          session,
+          cfCardPayment.getCard().getInstrumentId() ?? "");
+    }
+  }
+
+  void _completePaymentWithInstrumentId(final void Function(String) verifyPayment,
+      final void Function(CFErrorResponse, String) onError,
+      String card_cvv,
+      Map<String, dynamic> session,
+      String instrument_id) {
+
+    Map<String, String> card = {};
+
+      card = {
+        "instrument_id": instrument_id,
+        "card_cvv": card_cvv,
+      };
+
+    Map<String, dynamic> data = {
+      "session": session,
+      "card": card,
+      "save_payment_method": false,
+    };
+
+    // Create Method channel here
+    MethodChannel methodChannel = const MethodChannel(
+        'flutter_cashfree_pg_sdk');
+    methodChannel.invokeMethod("doCardPayment", data).then((value) {
+      if(value != null) {
+        final body = json.decode(value);
+        var status = body["status"] as String;
+        switch (status) {
+          case "exception":
+            var data = body["data"] as Map<String, dynamic>;
+            var cfErrorResponse = CFErrorResponse("FAILED", data["message"] as String, "invalid_request", "invalid_request");
+            onError(cfErrorResponse, session["order_id"] ?? "order_id_not_found");
+            break;
+          case "success":
+            var data = body["data"] as Map<String, dynamic>;
+            verifyPayment(data["order_id"] as String);
+            break;
+          case "failed":
+            var data = body["data"] as Map<String, dynamic>;
+            var errorResponse = CFErrorResponse(
+                data["status"] as String, data["message"] as String,
+                data["code"] as String, data["type"] as String);
+            onError(errorResponse, data["order_id"] as String);
+            break;
+        }
+      }
+    });
   }
 
   Map<String, dynamic> _convertToNetbankingMap(CFNetbankingPayment cfNetbankingPayment) {

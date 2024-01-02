@@ -1,3 +1,7 @@
+## 2.1.0+30
+
+* Android SDK updated to 2.1.6
+
 ## 2.0.26+29
 
 * Now the SDK supports making payments with saved cards.

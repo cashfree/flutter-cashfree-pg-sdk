@@ -67,6 +67,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     CFUPIUtils().getUPIApps().then((value) {
+      print("value");
       print(value);
       for(var i = 0; i < (value?.length ?? 0); i++) {
         var a = value?[i]["id"] as String ?? "";
@@ -181,7 +182,7 @@ class _MyAppState extends State<MyApp> {
     try {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
-      var card = CFCardBuilder().setCardWidget(cfCardWidget!).setInstrumentId("db178aff-b8cf-420e-b0ba-7af89f0d2263").setCardCVV("123").setCardExpiryMonth("12").setCardExpiryYear("25").setCardHolderName("Test").build();
+      var card = CFCardBuilder().setInstrumentId("db178aff-b8cf-420e-b0ba-7af89f0d2263").setCardCVV("123").build();
       var cardPayment = CFCardPaymentBuilder().setSession(session!).setCard(card).savePaymentMethod(true).build();
       cfPaymentGatewayService.doPayment(cardPayment);
     } on CFException catch (e) {
@@ -209,8 +210,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var oid = "order_18482Z3yahpNX76G8dp4J2yO7weUaDC";
-      var spi = "session_TyoIOf27EMGDBbHyd9VwbPKHkJRXxV7Fz3oihsyni2oH55iNx9dv3d1ll3aZgZ-xBKEXOYOE1l_z6red42QB2q4LMqZIhhxWBJ8S0Vcr2ZL7";
+      var oid = "order_18482a6vWX0q6kKeLLFroOegxXZuxcW";
+      var spi = "session_gQUSQATOLp88E-qRox3vB-H10IWAGgbnaDSNBpu6dxauSzitdg6cxu2GAzRYf-t4TL5aXs0BgvY6Og5eFilV4-JsNGUBsXU42Bv3kOjuLFVA";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {
