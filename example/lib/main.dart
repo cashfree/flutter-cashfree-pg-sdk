@@ -71,7 +71,7 @@ class _MyAppState extends State<MyApp> {
       print(value);
       for(var i = 0; i < (value?.length ?? 0); i++) {
         var a = value?[i]["id"] as String ?? "";
-        if(a.contains("phonepe")) {
+        if(a.contains("cashfree")) {
           selectedId = value?[i]["id"];
         }
       }
@@ -129,8 +129,8 @@ class _MyAppState extends State<MyApp> {
     print(cardListener.getMetaData());
   }
 
-  String orderId = "order_3242VhWIOoHkighuJbdpuhWdXE9Bsd";
-  String paymentSessionId = "session_PTi-Rhw3Pc4WqklJa66spUkB6BsJSo60sFvUf21KZLy0l_tzHNdGNH5dAc66grGxa_e6dJMGtr1ZpMldgAtDLF2MWauZvIYvKEDZL-fEZpi9";
+  String orderId = "order_6032i376cpyIuTTVae9vnqfmtgT8Hj";
+  String paymentSessionId = "session_nfU1ZczDG136bf7N7EQv6C6kL0dZn3Xw8EYtHmpmt0_dqt493wRnYG7PuUEuv96G57DuMOobE39WVnUth3tgd5k_odWFHa8dHIWoFzs3RzHS";
   void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
     print(event_name);
     print(meta_data);
@@ -182,7 +182,7 @@ class _MyAppState extends State<MyApp> {
     try {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
-      var card = CFCardBuilder().setInstrumentId("db178aff-b8cf-420e-b0ba-7af89f0d2263").setCardCVV("123").build();
+      var card = CFCardBuilder().setCardWidget(cfCardWidget!).setCardExpiryMonth("11").setCardExpiryYear("25").setCardHolderName("Bhanu Pratap Yadav").setCardCVV("858").build();
       var cardPayment = CFCardPaymentBuilder().setSession(session!).setCard(card).savePaymentMethod(true).build();
       cfPaymentGatewayService.doPayment(cardPayment);
     } on CFException catch (e) {
@@ -210,8 +210,10 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      var oid = "order_18482a6vWX0q6kKeLLFroOegxXZuxcW";
-      var spi = "session_gQUSQATOLp88E-qRox3vB-H10IWAGgbnaDSNBpu6dxauSzitdg6cxu2GAzRYf-t4TL5aXs0BgvY6Og5eFilV4-JsNGUBsXU42Bv3kOjuLFVA";
+      String oid = "order_6032i376cpyIuTTVae9vnqfmtgT8Hj";
+      String spi = "session_nfU1ZczDG136bf7N7EQv6C6kL0dZn3Xw8EYtHmpmt0_dqt493wRnYG7PuUEuv96G57DuMOobE39WVnUth3tgd5k_odWFHa8dHIWoFzs3RzHS";
+      // var oid = "order_18482hmCisOicEvPWfsUSHXwAlp4LjU";
+      // var spi = "session_Qhf6IS3AmPOOC1gg7Pz2rkSG1g4So8QRvLovw5WcEbKRKXULMhqFYhNqOchqPwp3hTvwBNPPIbpHRjh5gkwWgsUWw2gO8JPZjfPQwb7IC0sn";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {
