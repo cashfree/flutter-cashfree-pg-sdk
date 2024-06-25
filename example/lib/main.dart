@@ -210,8 +210,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      String oid = "order_6032i376cpyIuTTVae9vnqfmtgT8Hj";
-      String spi = "session_nfU1ZczDG136bf7N7EQv6C6kL0dZn3Xw8EYtHmpmt0_dqt493wRnYG7PuUEuv96G57DuMOobE39WVnUth3tgd5k_odWFHa8dHIWoFzs3RzHS";
+      String oid = "order_6032iMxf5ON2HuCOnCwuDQqxIylyMA";
+      String spi = "session_ZhppL1E88h3UM7p5tULR4XWig2gHt2WXADFkRQ5rssOqhfl7gWJJ1xvJVhK5DlMk3eltFySMKop1keIcN_fnuLJ-meWuI2snY5-7JFKOzqYT";
       // var oid = "order_18482hmCisOicEvPWfsUSHXwAlp4LjU";
       // var spi = "session_Qhf6IS3AmPOOC1gg7Pz2rkSG1g4So8QRvLovw5WcEbKRKXULMhqFYhNqOchqPwp3hTvwBNPPIbpHRjh5gkwWgsUWw2gO8JPZjfPQwb7IC0sn";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
@@ -236,7 +236,7 @@ class _MyAppState extends State<MyApp> {
   webCheckout() async {
     try {
       var session = createSession();
-      var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#ff00ff").setNavigationBarTextColor("#ffffff").build();
+      var theme = CFThemeBuilder().setNavigationBarBackgroundColorColor("#ffffff").setNavigationBarTextColor("#ffffff").build();
       var cfWebCheckout = CFWebCheckoutPaymentBuilder().setSession(session!).setTheme(theme).build();
       cfPaymentGatewayService.doPayment(cfWebCheckout);
     } on CFException catch (e) {
