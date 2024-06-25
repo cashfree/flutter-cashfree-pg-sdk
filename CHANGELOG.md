@@ -1,3 +1,8 @@
+## 2.1.3+33
+
+* Android status bar theme bug fix.
+* NPCI logo changes in Android recon view
+
 ## 2.1.2+32
 
 * Bug Fixes in Android.
