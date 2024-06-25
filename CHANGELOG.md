@@ -1,3 +1,7 @@
+## 2.1.2+32
+
+* Bug Fixes in Android.
+
 ## 2.1.1+31
 
 * Addressed namespace build issue with Android CompileSdk 34.
