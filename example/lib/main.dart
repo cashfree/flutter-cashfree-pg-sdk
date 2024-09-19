@@ -141,7 +141,7 @@ class _MyAppState extends State<MyApp> {
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.SANDBOX;
+  CFEnvironment environment = CFEnvironment.PRODUCTION;
   String selectedId = "";
 
   upiCollectPay() async {
@@ -182,7 +182,7 @@ class _MyAppState extends State<MyApp> {
     try {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
-      var card = CFCardBuilder().setCardWidget(cfCardWidget!).setCardExpiryMonth("11").setCardExpiryYear("26").setCardHolderName("Roronoa Zoro").setCardCVV("111").build();
+      var card = CFCardBuilder().setCardWidget(cfCardWidget!).setCardExpiryMonth("08").setCardExpiryYear("88").setCardHolderName("Roronoa Zoro").setCardCVV("888").build();
       var cardPayment = CFCardPaymentBuilder().setSession(session!).setCard(card).savePaymentMethod(true).build();
       cfPaymentGatewayService.doPayment(cardPayment);
     } on CFException catch (e) {
@@ -210,8 +210,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      String oid = "order_3242m12Ox0GYEnFkzqKOlRo6zeR3I1";
-      String spi = "session_awmZOSGbkzwcevZStwsSwjd08EPwLY39mXYfcc6Jde9QflwfFh6ljk0TDCuDbCmNhtqXABIJV5vjVYiXrA8gvZbDFmm9kpUnNSrGxHOzDIDK";
+      String oid = "order_18482mF7xpZfp6JRc7Ceg4N5fusU08u";
+      String spi = "session_WtkzGYJXob66ZFxh4PSnrspR-SBizE8XIIX76DRj04U2uTMCS1hzRbiUodqGOsQnk0qEaI5PAF0YgRLiW42nk0Dw8eYnV9JTwxBPQK0YOejK";
       // var oid = "order_18482hmCisOicEvPWfsUSHXwAlp4LjU";
       // var spi = "session_Qhf6IS3AmPOOC1gg7Pz2rkSG1g4So8QRvLovw5WcEbKRKXULMhqFYhNqOchqPwp3hTvwBNPPIbpHRjh5gkwWgsUWw2gO8JPZjfPQwb7IC0sn";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();

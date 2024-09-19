@@ -1,3 +1,7 @@
+## 2.1.5+35
+
+* OTP Auto Read functionality for card component in android.
+
 ## 2.1.4+34
 
 * OTP Auto Read functionality for card component in android.
