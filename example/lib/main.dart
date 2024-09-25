@@ -141,7 +141,7 @@ class _MyAppState extends State<MyApp> {
 
   // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
   // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
+  CFEnvironment environment = CFEnvironment.SANDBOX;
   String selectedId = "";
 
   upiCollectPay() async {
@@ -210,8 +210,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      String oid = "order_18482mF7xpZfp6JRc7Ceg4N5fusU08u";
-      String spi = "session_WtkzGYJXob66ZFxh4PSnrspR-SBizE8XIIX76DRj04U2uTMCS1hzRbiUodqGOsQnk0qEaI5PAF0YgRLiW42nk0Dw8eYnV9JTwxBPQK0YOejK";
+      String oid = "order_3242mYV4ARsSL5mIgIStnmCwKuLhyq";
+      String spi = "session_t9ZSj8ZvwfUYW1J14N_l4WnGbL-8GTfmCtS3MHyvY8THG9m_FrmDCZFoRDlGIYuGcpxOLTsbPs_HoDnwPF7X8Y6uhL2DgUQYOEXqRvRoG0bD";
       // var oid = "order_18482hmCisOicEvPWfsUSHXwAlp4LjU";
       // var spi = "session_Qhf6IS3AmPOOC1gg7Pz2rkSG1g4So8QRvLovw5WcEbKRKXULMhqFYhNqOchqPwp3hTvwBNPPIbpHRjh5gkwWgsUWw2gO8JPZjfPQwb7IC0sn";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();

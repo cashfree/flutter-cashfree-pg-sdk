@@ -150,8 +150,11 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
           apps.add(cfUPIApp.toMap());
         }
         uiThreadHandler.post(() -> {
-          if(result != null) {
-            result.success(apps);
+          try {
+            if(result != null) {
+              result.success(apps);
+            }
+          } catch(Exception e) {
           }
         });
       });
@@ -228,15 +231,21 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         handleExceptions(e.getMessage());
       }
     } else if (call.method.equals("response")) {
-        if(finalResponse != null) {
-          if(result != null) {
-            result.success(finalResponse.toString());
-            finalResponse = null;
+        try {
+          if(finalResponse != null) {
+            if(result != null) {
+              result.success(finalResponse.toString());
+              finalResponse = null;
+            }
           }
+        } catch(Exception e) {
         }
     } else {
-      if(result != null) {
-        result.notImplemented();
+      try {
+        if(result != null) {
+          result.notImplemented();
+        }
+      } catch(Exception e) {
       }
     }
   }
@@ -386,11 +395,14 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     successReponse.put("status", "success");
     successReponse.put("data", order);
     JSONObject jsonResponse = new JSONObject(successReponse);
-    if(result != null) {
-      result.success(jsonResponse.toString());
-      result = null;
-    } else {
-      finalResponse = jsonResponse;
+    try {
+      if(result != null) {
+        result.success(jsonResponse.toString());
+        result = null;
+      } else {
+        finalResponse = jsonResponse;
+      }
+    } catch(Exception e) {
     }
   }
 
@@ -406,11 +418,14 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     finalMap.put("status", "failed");
     finalMap.put("data", errorResponse);
     JSONObject jsonObject = new JSONObject(finalMap);
-    if(result != null) {
-      result.success(jsonObject.toString());
-      result = null;
-    } else {
-      finalResponse = jsonObject;
+    try {
+      if(result != null) {
+        result.success(jsonObject.toString());
+        result = null;
+      } else {
+        finalResponse = jsonObject;
+      }
+    } catch(Exception e) {
     }
   }
 
@@ -421,9 +436,12 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     finalMap.put("status", "exception");
     finalMap.put("data", exceptions);
     JSONObject jsonObject = new JSONObject(finalMap);
-    if(result != null) {
-      result.success(jsonObject.toString());
-      result = null;
+    try {
+      if(result != null) {
+        result.success(jsonObject.toString());
+        result = null;
+      }
+    } catch(Exception e) {
     }
   }
 
