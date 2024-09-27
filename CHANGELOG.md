@@ -1,3 +1,7 @@
+## 2.1.7+37
+
+* Updated iOS sdk to 2.0.18
+
 ## 2.1.6+36
 
 * OTP Auto Read functionality for card component in android.
