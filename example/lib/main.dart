@@ -170,7 +170,7 @@ class _MyAppState extends State<MyApp> {
     try {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
-      var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT).setUPIID(selectedId).build();
+      var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT_WITH_UI).build();
       var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
     } on CFException catch (e) {
@@ -210,8 +210,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      String oid = "order_3242mYV4ARsSL5mIgIStnmCwKuLhyq";
-      String spi = "session_t9ZSj8ZvwfUYW1J14N_l4WnGbL-8GTfmCtS3MHyvY8THG9m_FrmDCZFoRDlGIYuGcpxOLTsbPs_HoDnwPF7X8Y6uhL2DgUQYOEXqRvRoG0bD";
+      String oid = "order_342ohRRh4qYPfPZHY0IDsgPnbPYVk";
+      String spi = "session_weVlLEAUYeKUAtWqGNuZGRFv2zIAwgXXLGd54toKCpKpIj-VhWQWizg8KeR-Bsu-dXbpzDJ46E3R3uhnoG_8hS1t2YuU4WCBZJO8GZArJu33";
       // var oid = "order_18482hmCisOicEvPWfsUSHXwAlp4LjU";
       // var spi = "session_Qhf6IS3AmPOOC1gg7Pz2rkSG1g4So8QRvLovw5WcEbKRKXULMhqFYhNqOchqPwp3hTvwBNPPIbpHRjh5gkwWgsUWw2gO8JPZjfPQwb7IC0sn";
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();

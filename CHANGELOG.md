@@ -1,3 +1,7 @@
+## 2.2.0+38
+
+* Added UPI only payment flow with the UI powered by Cashfree Payments.
+
 ## 2.1.7+37
 
 * Updated iOS sdk to 2.0.18
