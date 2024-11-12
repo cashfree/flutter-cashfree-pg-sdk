@@ -98,9 +98,15 @@ class CFPaymentGatewayService {
           responseMethod(value);
         });
       } else if(cfPayment is CFUPIPayment) {
-        methodChannel.invokeMethod("doUPIPayment", data).then((value) {
-          responseMethod(value);
-        });
+        if(cfPayment.getUPI().getChannel() == CFUPIChannel.INTENT_WITH_UI) {
+          methodChannel.invokeMethod("doUPIPaymentWithUI", data).then((value) {
+            responseMethod(value);
+          });
+        } else {
+          methodChannel.invokeMethod("doUPIPayment", data).then((value) {
+            responseMethod(value);
+          });
+        }
       } else if (cfPayment is CFNetbankingPayment) {
         methodChannel.invokeMethod("doNetbankingPayment", data).then((value) {
           responseMethod(value);
@@ -243,7 +249,7 @@ class CFPaymentGatewayService {
 
     Map<String, String> upi = {
       "channel": cfupiPayment.getUPI().getChannel() == CFUPIChannel.COLLECT ? "collect" : "intent",
-      "upi_id": cfupiPayment.getUPI().getUPIID(),
+      "upi_id": cfupiPayment.getUPI().getChannel() == CFUPIChannel.INTENT_WITH_UI ? "" : cfupiPayment.getUPI().getUPIID(),
     };
 
     Map<String, dynamic> data = {

@@ -1,6 +1,7 @@
 enum CFUPIChannel {
   COLLECT,
-  INTENT
+  INTENT,
+  INTENT_WITH_UI
 }
 
 class CFUPIBuilder {
@@ -29,6 +30,9 @@ class CFUPIBuilder {
   }
 
   CFUPI build() {
+    if(_channel == CFUPIChannel.INTENT_WITH_UI) {
+      _upi_id = "";
+    }
     return CFUPI(this);
   }
 

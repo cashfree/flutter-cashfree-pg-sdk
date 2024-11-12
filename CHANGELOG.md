@@ -1,3 +1,23 @@
+## 2.2.0+38
+
+* Added UPI only payment flow with the UI powered by Cashfree Payments.
+
+## 2.1.7+37
+
+* Updated iOS sdk to 2.0.18
+
+## 2.1.6+36
+
+* OTP Auto Read functionality for card component in android.
+
+## 2.1.5+35
+
+* OTP Auto Read functionality for card component in android.
+
+## 2.1.4+34
+
+* OTP Auto Read functionality for card component in android.
+
 ## 2.1.3+33
 
 * Android status bar theme bug fix.

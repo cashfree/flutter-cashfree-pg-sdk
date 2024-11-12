@@ -40,6 +40,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import com.cashfree.pg.ui.api.upi.intent.CFUPIIntentCheckout;
+import com.cashfree.pg.ui.api.upi.intent.CFUPIIntentCheckoutPayment;
 
 /**
  Predefining a structure to send back response in json string
@@ -112,7 +114,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfNetBanking(cfNetBanking)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.1.1");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.0");
         cfNetBankingPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfNetBankingPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -135,11 +137,33 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfUPI(cfupi)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.1.1");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.0");
         cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
         gatewayService.doPayment(this.activity, cfupiPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if(call.method.equals("doUPIPaymentWithUI")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> upi = (Map<String, String>) request.get("upi");
+      try {
+        // Create Session
+        CFSession cfSession = createSession(session);
+
+        CFUPIIntentCheckout cfupiIntentCheckout = new CFUPIIntentCheckout.CFUPIIntentBuilder()
+                                                  .build();
+        CFUPIIntentCheckoutPayment cfupiIntentCheckoutPayment = new CFUPIIntentCheckoutPayment.CFUPIIntentPaymentBuilder()
+                .setSession(cfSession)
+                .setCfUPIIntentCheckout(cfupiIntentCheckout)
+                .build();
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.0");
+        cfupiIntentCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfupiIntentCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.INTENT);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doPayment(this.activity, cfupiIntentCheckoutPayment);
       } catch (CFException e) {
         handleExceptions(e.getMessage());
       }
@@ -150,8 +174,11 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
           apps.add(cfUPIApp.toMap());
         }
         uiThreadHandler.post(() -> {
-          if(result != null) {
-            result.success(apps);
+          try {
+            if(result != null) {
+              result.success(apps);
+            }
+          } catch(Exception e) {
           }
         });
       });
@@ -171,8 +198,8 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .setSaveCardDetail(savePaymentMethod)
                 .build();
-
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.1.1");
+        cfCardPayment.setCfSDKFlow(CFPayment.CFSDKFlow.WITH_CASHFREE_FULLSCREEN_LOADER);
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.0");
         cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -198,7 +225,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.1.1");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.0");
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -219,7 +246,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .setCFWebCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.1.1");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.0");
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -228,15 +255,21 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         handleExceptions(e.getMessage());
       }
     } else if (call.method.equals("response")) {
-        if(finalResponse != null) {
-          if(result != null) {
-            result.success(finalResponse.toString());
-            finalResponse = null;
+        try {
+          if(finalResponse != null) {
+            if(result != null) {
+              result.success(finalResponse.toString());
+              finalResponse = null;
+            }
           }
+        } catch(Exception e) {
         }
     } else {
-      if(result != null) {
-        result.notImplemented();
+      try {
+        if(result != null) {
+          result.notImplemented();
+        }
+      } catch(Exception e) {
       }
     }
   }
@@ -335,6 +368,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
         cfCard = new CFCard.CFCardBuilder()
                 .setInstrumentId(card.get("instrument_id"))
                 .setCVV(card.get("card_cvv"))
+                .setChannel("post")
                 .build();
       } else {
         cfCard = new CFCard.CFCardBuilder()
@@ -343,6 +377,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCardNumber(card.get("card_number"))
                 .setCardHolderName(card.get("card_holder_name"))
                 .setCVV(card.get("card_cvv"))
+                .setChannel("post")
                 .build();
       }
       return cfCard;
@@ -384,11 +419,14 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     successReponse.put("status", "success");
     successReponse.put("data", order);
     JSONObject jsonResponse = new JSONObject(successReponse);
-    if(result != null) {
-      result.success(jsonResponse.toString());
-      result = null;
-    } else {
-      finalResponse = jsonResponse;
+    try {
+      if(result != null) {
+        result.success(jsonResponse.toString());
+        result = null;
+      } else {
+        finalResponse = jsonResponse;
+      }
+    } catch(Exception e) {
     }
   }
 
@@ -404,11 +442,14 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     finalMap.put("status", "failed");
     finalMap.put("data", errorResponse);
     JSONObject jsonObject = new JSONObject(finalMap);
-    if(result != null) {
-      result.success(jsonObject.toString());
-      result = null;
-    } else {
-      finalResponse = jsonObject;
+    try {
+      if(result != null) {
+        result.success(jsonObject.toString());
+        result = null;
+      } else {
+        finalResponse = jsonObject;
+      }
+    } catch(Exception e) {
     }
   }
 
@@ -419,9 +460,12 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
     finalMap.put("status", "exception");
     finalMap.put("data", exceptions);
     JSONObject jsonObject = new JSONObject(finalMap);
-    if(result != null) {
-      result.success(jsonObject.toString());
-      result = null;
+    try {
+      if(result != null) {
+        result.success(jsonObject.toString());
+        result = null;
+      }
+    } catch(Exception e) {
     }
   }
 
