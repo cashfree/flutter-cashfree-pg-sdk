@@ -1,3 +1,7 @@
+## 2.2.3+41
+
+* Deprecated Drop Checkout Payment.
+
 ## 2.2.2+40
 
 * Introduced Auto OTP read in Android
