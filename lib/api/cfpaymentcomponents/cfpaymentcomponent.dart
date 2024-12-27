@@ -1,5 +1,6 @@
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 
+@Deprecated("This integration is no longer supported. Please use CFWebCheckoutPayment")
 class CFPaymentComponentBuilder {
   List<CFPaymentModes> _components = [CFPaymentModes.CARD, CFPaymentModes.UPI, CFPaymentModes.NETBANKING, CFPaymentModes.WALLET, CFPaymentModes.PAYLATER, CFPaymentModes.EMI];
 

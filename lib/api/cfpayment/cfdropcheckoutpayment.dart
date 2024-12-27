@@ -5,6 +5,7 @@ import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 import '../cfpaymentcomponents/cfpaymentcomponent.dart';
 import '../cftheme/cftheme.dart';
 
+@Deprecated("This integration is no longer supported. Please use CFWebCheckoutPayment")
 class CFDropCheckoutPaymentBuilder {
 
   CFSession? _session;
