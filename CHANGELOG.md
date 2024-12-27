@@ -1,3 +1,7 @@
+## 2.2.2+40
+
+* Introduced Auto OTP read in Android
+
 ## 2.2.1+39
 
 * Cashfree Android SDK updated to latest version.
