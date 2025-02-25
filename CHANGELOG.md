@@ -1,3 +1,8 @@
+## 2.2.4+42
+
+* Upgrade android sdk version
+* iOS version updated to 2.1.0
+
 ## 2.2.3+41
 
 * Deprecated Drop Checkout Payment.
