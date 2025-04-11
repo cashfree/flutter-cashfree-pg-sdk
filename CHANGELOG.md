@@ -1,3 +1,7 @@
+## 2.2.6-beta+44
+
+* Beta Publish testing
+
 ## 2.2.5+43
 
 * Added Payfast in iOS and Android.
