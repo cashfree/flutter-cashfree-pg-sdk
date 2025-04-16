@@ -1,3 +1,8 @@
+## 2.2.6+44
+
+* Upgrade android sdk version 2.2.2
+* iOS version updated to 2.2.1
+
 ## 2.2.5+43
 
 * Added Payfast in iOS and Android.

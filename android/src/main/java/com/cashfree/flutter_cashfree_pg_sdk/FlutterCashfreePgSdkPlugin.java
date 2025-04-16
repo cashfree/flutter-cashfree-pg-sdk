@@ -86,6 +86,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
   private Activity activity;
   private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
+  private final String CF_FL_SDK_VERSION = "2.2.6";
 
   void FlutterCashfreePgSdkPlugin() {}
 
@@ -114,7 +115,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfNetBanking(cfNetBanking)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.5");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
         cfNetBankingPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfNetBankingPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -137,7 +138,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCfUPI(cfupi)
                 .build();
 
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.5");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
         cfupiPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -159,7 +160,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .setCfUPIIntentCheckout(cfupiIntentCheckout)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.5");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
         cfupiIntentCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfupiIntentCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.INTENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -199,7 +200,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSaveCardDetail(savePaymentMethod)
                 .build();
         cfCardPayment.setCfSDKFlow(CFPayment.CFSDKFlow.WITH_CASHFREE_FULLSCREEN_LOADER);
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.5");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
         cfCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.ELEMENT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -225,7 +226,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setCFUIPaymentModes(component)
                 .setCFNativeCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.5");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
         cfDropCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfDropCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.DROP);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
@@ -246,7 +247,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .setSession(cfSession)
                 .setCFWebCheckoutUITheme(cfTheme)
                 .build();
-        CFPayment.CFSDKFramework.FLUTTER.withVersion("2.2.5");
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
         cfWebCheckoutPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
         cfWebCheckoutPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.WEB_CHECKOUT);
         CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();

@@ -67,12 +67,14 @@ class _MyAppState extends State<MyApp> {
     }
 
     CFUPIUtils().getUPIApps().then((value) {
-      print("value");
-      print(value);
       for(var i = 0; i < (value?.length ?? 0); i++) {
+        print("UPI Icon base64Icon ==> ${value?[i]["base64Icon"]}");
+        print("UPI Package Identifier ==>${value?[i]["id"]}");
+        print("UPI App Name ==> ${value?[i]["displayName"]}");
         var a = value?[i]["id"] as String ?? "";
         if(a.contains("cashfree")) {
-          selectedId = value?[i]["id"];
+          upiPackageName = value?[i]["id"];
+          print("UPI PackageName ==> $upiPackageName");
         }
       }
     });
@@ -99,6 +101,7 @@ class _MyAppState extends State<MyApp> {
               // )
               TextButton(onPressed: pay, child: const Text("Pay")),
               TextButton(onPressed: webCheckout, child: const Text("Web Checkout")),
+              TextButton(onPressed: upiIntentCheckout, child: const Text("UPI Intent Checkout")),
               cfCardWidget!,
               TextButton(onPressed: cardPay, child: const Text("Card Pay")),
               TextButton(onPressed: upiCollectPay, child: const Text("UPI Collect Pay")),
@@ -118,8 +121,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void onError(CFErrorResponse errorResponse, String orderId) {
-    print(errorResponse.getMessage());
     print("Error while making payment");
+    print(errorResponse.getMessage());
   }
 
   void cardListener(CFCardListener cardListener) {
@@ -129,23 +132,31 @@ class _MyAppState extends State<MyApp> {
     print(cardListener.getMetaData());
   }
 
-  String orderId = "order_6032i376cpyIuTTVae9vnqfmtgT8Hj";
-  String paymentSessionId = "session_nfU1ZczDG136bf7N7EQv6C6kL0dZn3Xw8EYtHmpmt0_dqt493wRnYG7PuUEuv96G57DuMOobE39WVnUth3tgd5k_odWFHa8dHIWoFzs3RzHS";
+  String orderId = "devstudio_7318157564499795298";
+  String paymentSessionId = "session_GPXQ9UXdmPZPYNaENynIezYeoEK1kZkmMnR8fDPtYH2mJgS_dqIENfGw9k3rRNjpXW8PfgpdTDXIr6-q6TSTxCL9oE0DRzVrnaySGR5Q-h8NxEiwpg6DpdcOYIMpayment";
   void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
     print(event_name);
     print(meta_data);
   }
 
-  // String orderId = "order_18482TC1GWfnEYW3gheFhy4mArfynXh";
-  // String paymentSessionId = "session_gMej8P4gvNUKLbd3fGWVw7Njg5fj3KK4We0HjCg6Tkzy5yZ8mkghdv7vKels1CJ8fBz9_aVpSoU8n5rqufVQrexzhLW0g0dzgdiTJwmrkZYn";
+  CFEnvironment environment = CFEnvironment.SANDBOX;
+  String upiPackageName = "";
 
-  // String orderId = "order_18482OupTxSofcClBAlgqyYxUVceHo8";
-  // String paymentSessionId = "session_oeYlKCusKyW5pND4Swzn1rE2-gwnoM8MOC2nck9RjIiUQwXcPLWB3U1xHaaItb-uA9H1k6Fwziq9O63DWcfYGy_3B7rl1nDFo3MMeVqiYrBr";
-  CFEnvironment environment = CFEnvironment.PRODUCTION;
-  String selectedId = "";
+  upiIntentCheckout() async {
+    try {
+      cfPaymentGatewayService.setCallback(verifyPayment, onError);
+      var session = createSession();
+      var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT_WITH_UI).build();
+      var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
+      cfPaymentGatewayService.doPayment(upiPayment);
+    } on CFException catch (e) {
+      print(e.message);
+    }
+  }
 
   upiCollectPay() async {
     try {
+      cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
       var upi = CFUPIBuilder().setChannel(CFUPIChannel.COLLECT).setUPIID("suhasg6@ybl").build();
       var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
@@ -157,6 +168,7 @@ class _MyAppState extends State<MyApp> {
 
   netbankingPay() async {
     try {
+      cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
       var netbanking = CFNetbankingBuilder().setChannel("link").setBankCode(3003).build();
       var netbankingPayment = CFNetbankingPaymentBuilder().setSession(session!).setNetbanking(netbanking).build();
@@ -170,7 +182,7 @@ class _MyAppState extends State<MyApp> {
     try {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = createSession();
-      var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT_WITH_UI).build();
+      var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT).setUPIID(upiPackageName).build();
       var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
     } on CFException catch (e) {
@@ -210,10 +222,8 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      String oid = "devstudio_371a8866";
-      String spi = "session_XaXxVm2cvfXnPxD-gaXd7BKlJY1aWGw9BjPXUXvpFc-Y-V3krXmlElNqMdXypEwwOoBylzogSg76zW3Tn1etJ5k_bU5Ng3VbU3fOlexRuZXPQI0MSfAvTCopayment";
-      // var oid = "order_18482hmCisOicEvPWfsUSHXwAlp4LjU";
-      // var spi = "session_Qhf6IS3AmPOOC1gg7Pz2rkSG1g4So8QRvLovw5WcEbKRKXULMhqFYhNqOchqPwp3hTvwBNPPIbpHRjh5gkwWgsUWw2gO8JPZjfPQwb7IC0sn";
+      String oid = orderId;
+      String spi = paymentSessionId;
       var session = CFSessionBuilder().setEnvironment(environment).setOrderId(oid).setPaymentSessionId(spi).build();
       return session;
     } on CFException catch (e) {
