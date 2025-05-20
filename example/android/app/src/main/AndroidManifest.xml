@@ -31,5 +31,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <meta-data
+           android:name="cashfree_subscription_flow_enable"
+           android:value="true" />
     </application>
 </manifest>

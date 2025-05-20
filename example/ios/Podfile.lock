@@ -1,21 +1,24 @@
 PODS:
-  - CashfreeAnalyticsSDK (2.0.15):
-    - CFNetworkSDK (~> 2.0.15)
-  - CashfreePG (2.1.0):
-    - CashfreePGUISDK (= 2.1.0)
-  - CashfreePGCoreSDK (2.0.19):
-    - CashfreeAnalyticsSDK (~> 2.0.15)
-  - CashfreePGUISDK (2.1.0):
-    - CashfreePGCoreSDK (= 2.0.19)
-  - CFNetworkSDK (2.0.15)
+  - CashfreeAnalyticsSDK (2.2.0):
+    - CFNetworkSDK (= 2.2.0)
+  - CashfreePG (2.2.1):
+    - CashfreePGUISDK (= 2.2.1)
+  - CashfreePGCoreSDK (2.2.1):
+    - CashfreeAnalyticsSDK (= 2.2.0)
+  - CashfreePGUISDK (2.2.1):
+    - CashfreePGCoreSDK (= 2.2.1)
+  - CFNetworkSDK (2.2.0)
   - Flutter (1.0.0)
   - flutter_cashfree_pg_sdk (0.0.1):
-    - CashfreePG (= 2.1.0)
+    - CashfreePG (= 2.2.1)
+    - Flutter
+  - fluttertoast (0.0.2):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_cashfree_pg_sdk (from `.symlinks/plugins/flutter_cashfree_pg_sdk/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
 
 SPEC REPOS:
   trunk:
@@ -30,16 +33,19 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_cashfree_pg_sdk:
     :path: ".symlinks/plugins/flutter_cashfree_pg_sdk/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
 
 SPEC CHECKSUMS:
-  CashfreeAnalyticsSDK: 139202f1fd63baae030e4ea5190f687e741e275d
-  CashfreePG: 88d2e0e7e415fc43e29d679b31cf0b119977c8fc
-  CashfreePGCoreSDK: 2168c1df4eb80105e182e140fc8d50937957a472
-  CashfreePGUISDK: 01aa944275e574b287db2c0530378a7d84271342
-  CFNetworkSDK: a77f15830ba0de6957abdafd82e61b7453705f7f
+  CashfreeAnalyticsSDK: ae25b71a54607c920d519103d154d9727ca2c15a
+  CashfreePG: 194b2346624350c5bac27ae3ede7e481ca404ea9
+  CashfreePGCoreSDK: 67dd05e930c6ca03632a7cf92606718002675f68
+  CashfreePGUISDK: 74f9af785d215b24bb675b330347b3e0c44c4f67
+  CFNetworkSDK: 4e431b55f607544f5ca45bc1a36a13e602f51841
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_cashfree_pg_sdk: 22d213343ef1c3f2841693d783acdca5065c48b1
+  flutter_cashfree_pg_sdk: e69cb5615290e4bd5574d6becd41ea327e9f61a1
+  fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
 
 PODFILE CHECKSUM: 7fc06bdc210e32f184a427efec8c48cb900e085b
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.16.2

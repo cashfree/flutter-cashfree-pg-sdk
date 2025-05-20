@@ -1,3 +1,7 @@
+## 2.2.7+45
+
+* Introduced Android Subscription Checkout flow
+
 ## 2.2.6+44
 
 * Upgrade android sdk version 2.2.2

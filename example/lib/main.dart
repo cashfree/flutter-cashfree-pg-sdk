@@ -7,16 +7,22 @@ import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcardpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbanking.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbankingpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfsubscriptioncheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentcomponents/cfpaymentcomponent.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsubssession.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cftheme/cftheme.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfupi/cfupiutils.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -32,6 +38,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   var cfPaymentGatewayService = CFPaymentGatewayService();
+  var clientIDController = TextEditingController();
+  var clientSecretController = TextEditingController();
 
   CFCardWidget? cfCardWidget;
 
@@ -99,9 +107,41 @@ class _MyAppState extends State<MyApp> {
               //   width: 500,
               //   child: WebViewWidget(controller: controller),
               // )
-              TextButton(onPressed: pay, child: const Text("Pay")),
-              TextButton(onPressed: webCheckout, child: const Text("Web Checkout")),
-              TextButton(onPressed: upiIntentCheckout, child: const Text("UPI Intent Checkout")),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: TextField(
+                  controller: clientIDController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: 'Enter AppId',
+                    contentPadding: const EdgeInsets.all(15.0),
+                  ),
+                ),
+              ),
+              Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: TextField(
+                    controller: clientSecretController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      hintText: 'Enter App Secret',
+                      contentPadding: const EdgeInsets.all(15.0),
+                    ),
+                  )),
+              TextButton(onPressed: pay, child: const Text("Drop Pay flow")),
+              TextButton(
+                  onPressed: webCheckout,
+                  child: const Text("Web Checkout Flow")),
+              TextButton(
+                  onPressed: upiIntentCheckout,
+                  child: const Text("UPI Intent Checkout")),
+              TextButton(
+                  onPressed: () => susbcriptionCheckout(context),
+                  child: const Text("Subscription Web Checkout Flow")),
               cfCardWidget!,
               TextButton(onPressed: cardPay, child: const Text("Card Pay")),
               TextButton(onPressed: upiCollectPay, child: const Text("UPI Collect Pay")),
@@ -217,7 +257,6 @@ class _MyAppState extends State<MyApp> {
     } on CFException catch (e) {
       print(e.message);
     }
-
   }
 
   CFSession? createSession() {
@@ -252,7 +291,110 @@ class _MyAppState extends State<MyApp> {
     } on CFException catch (e) {
       print(e.message);
     }
-
   }
 
+  susbcriptionCheckout(BuildContext context) async {
+    try {
+      cfPaymentGatewayService.setCallback(
+          onSubscriptionVerify, onSubscriptionFailure);
+      var session = await createSubscriptionSession();
+      if (session == null) {
+        print("Subscription Session creation failed");
+        showToast("Subscription Session creation failed");
+        return;
+      }
+      var theme = CFThemeBuilder()
+          .setNavigationBarBackgroundColorColor("#ffffff")
+          .setNavigationBarTextColor("#ffffff")
+          .build();
+      var cfsubscriptionCheckout = CFSubscriptionPaymentBuilder()
+          .setSession(session)
+          .setTheme(theme)
+          .build();
+      cfPaymentGatewayService.doPayment(cfsubscriptionCheckout);
+    } on CFException catch (e) {
+      print(e.message);
+    }
+  }
+
+  Future<CFSubscriptionSession?> createSubscriptionSession() async {
+    const uuid = Uuid();
+    final String subscriptionId = 'sub_${uuid.v4()}';
+    final url = Uri.parse('https://sandbox.cashfree.com/pg/subscriptions');
+
+    final headers = {
+      'accept': 'application/json',
+      'content-type': 'application/json',
+      'x-api-version': '2023-08-01',
+      'x-client-id': clientIDController.text,
+      'x-client-secret': clientSecretController.text,
+    };
+
+    final body = jsonEncode({
+      "customer_details": {
+        "customer_name": "Mukul Jain",
+        "customer_email": "mukul.jain@cashfree.com",
+        "customer_phone": "8810643608"
+      },
+      "plan_details": {"plan_id": "plan_12344"},
+      "authorization_details": {
+        "authorization_amount": 1,
+        "authorization_amount_refund": true
+      },
+      "subscription_meta": {
+        "return_url": "https://wa.me/9512440440?text=Payment%20Successfull",
+        "notification_channel": ["EMAIL", "SMS"]
+      },
+      "subscription_id": subscriptionId,
+      "subscription_note": "testSUBB",
+      "subscription_expiry_time": "2026-01-14T23:00:08+05:30",
+      "notificationChannels": ["EMAIL", "SMS"]
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final subscriptionSessionId = data['subscription_session_id'];
+        final subscriptionId = data['subscription_id'];
+        var subsriptionSession = CFSubscriptionSessionBuilder()
+            .setEnvironment(environment)
+            .setSubscriptionId(subscriptionId)
+            .setSubscriptionSessionId(subscriptionSessionId)
+            .build();
+        return subsriptionSession;
+      } else {
+        print(
+            "Failed to create subscription: ${response.statusCode} ${response.body}");
+      }
+    } catch (e) {
+      print("Exception during subscription creation: $e");
+    }
+
+    return null;
+  }
+
+  void onSubscriptionVerify(String subscriptionId) {
+    print("Verify Subscription ===> $subscriptionId");
+    showToast("Verify Subs ID ==> $subscriptionId");
+  }
+
+  void onSubscriptionFailure(CFErrorResponse errorResponse, String data) {
+    print("Failure in subscription flow");
+    print(errorResponse.getMessage());
+    showToast(errorResponse.getMessage());
+  }
+
+  void showToast( String? message){
+    Fluttertoast.showToast(
+        msg: "$message",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
 }
