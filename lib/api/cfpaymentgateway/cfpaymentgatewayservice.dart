@@ -7,6 +7,7 @@ import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfcardpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfdropcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfnetbankingpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfsubscriptioncheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
@@ -84,6 +85,9 @@ class CFPaymentGatewayService {
       } else if (cfPayment is CFNetbankingPayment) {
         CFNetbankingPayment cfNetbankingPayment = cfPayment;
         data = _convertToNetbankingMap(cfNetbankingPayment);
+      } else if (cfPayment is CFSubscriptionPayment) {
+        CFSubscriptionPayment cfSubscriptionPayment = cfPayment;
+        data = _convertToSubscriptionCheckoutMap(cfSubscriptionPayment);
       }
 
       // Create Method channel here
@@ -111,6 +115,10 @@ class CFPaymentGatewayService {
         methodChannel.invokeMethod("doNetbankingPayment", data).then((value) {
           responseMethod(value);
         });
+      } else if (cfPayment is CFSubscriptionPayment) {
+        methodChannel.invokeMethod("doSubscriptionPayment", data).then((value) {
+          responseSubscriptionMethod(value);
+        });
       }
     }
   }
@@ -134,6 +142,31 @@ class CFPaymentGatewayService {
               data["status"] as String, data["message"] as String,
               data["code"] as String, data["type"] as String);
           onError!(errorResponse, data["order_id"] as String);
+          break;
+      }
+    }
+  }
+
+  void responseSubscriptionMethod(dynamic value) {
+    if(value != null) {
+      final body = json.decode(value);
+      var status = body["status"] as String;
+      switch (status) {
+        case "exception":
+          var data = body["data"] as Map<String, dynamic>;
+          var cfErrorResponse = CFErrorResponse("FAILED", data["message"] as String, "invalid_request", "invalid_request");
+          onError!(cfErrorResponse, "");
+          break;
+        case "success":
+          var data = body["data"] as Map<String, dynamic>;
+          verifyPayment!(data["subscriptionId"] as String);
+          break;
+        case "failed":
+          var data = body["data"] as Map<String, dynamic>;
+          var errorResponse = CFErrorResponse(
+              data["status"] as String, data["message"] as String,
+              data["code"] as String, data["type"] as String);
+          onError!(errorResponse, "");
           break;
       }
     }
@@ -276,6 +309,25 @@ class CFPaymentGatewayService {
       "secondaryTextColor": cfWebCheckoutPayment.getTheme().getSecondaryTextColor(),
       "primaryFont": cfWebCheckoutPayment.getTheme().getPrimaryFont(),
       "secondaryFont": cfWebCheckoutPayment.getTheme().getSecondaryFont()
+    };
+
+    Map<String, dynamic> data = {
+      "session": session,
+      "theme": theme
+    };
+    return data;
+  }
+
+  Map<String, dynamic> _convertToSubscriptionCheckoutMap(CFSubscriptionPayment cfSubscriptionPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfSubscriptionPayment.getSession().getEnvironment(),
+      "subscription_id": cfSubscriptionPayment.getSession().getSubscriptionId(),
+      "subscription_session_id": cfSubscriptionPayment.getSession().getSubscriptionSessionID()
+    };
+
+    Map<String, dynamic> theme = {
+      "navigationBarBackgroundColor": cfSubscriptionPayment.getTheme().getNavigationBarBackgroundColor(),
+      "navigationBarTextColor": cfSubscriptionPayment.getTheme().getNavigationBarTextColor()
     };
 
     Map<String, dynamic> data = {

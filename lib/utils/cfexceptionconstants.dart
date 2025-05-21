@@ -9,4 +9,7 @@ class CFExceptionConstants {
   static String CALLBACK_NOT_SET = "callbacks have to be set before initiating the payment";
   static String ONE_PAYMENT_MODE_IS_REQUIRED = "at least one payment mode should be present";
 
+  static String SUBSCRIPTION_ID_NOT_PRESENT = "subscription id cannot be empty";
+  static String SUBSCRIPTION_SESSION_ID_NOT_PRESENT = "subscription session id cannot be empty";
+
 }
