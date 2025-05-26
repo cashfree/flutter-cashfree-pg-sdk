@@ -39,7 +39,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
-    private let versionNumber = "2.2.7"
+    private let versionNumber = "2.2.8"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())
@@ -207,6 +207,24 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 let err = e as! CashfreeError
                 self.sendException(message: err.localizedDescription)
             }
+        } else if method == "doSubscriptionPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            do {
+                let subscriptionSession = try self.createSubscriptionSession(session: session)
+                let subsCheckoutPayment = try CFSubscriptionPayment.CFSubscriptionPaymentBuilder()
+                                .setSession(subscriptionSession)
+                                .build()
+                let systemVersion = UIDevice.current.systemVersion
+                subsCheckoutPayment.setPlatform("iflt-sbc-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.startSubscription(subsCheckoutPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
         }
     }
     
@@ -225,6 +243,27 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 .build()
             
             return cfSession
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+    
+    private func createSubscriptionSession(session: Dictionary<String, String>) throws -> CFSubscriptionSession {
+        do {
+            var environment = CFENVIRONMENT.PRODUCTION
+            if let env = session["environment"] {
+                if env == "SANDBOX" {
+                    environment = .SANDBOX
+                }
+            }
+            let cfSubsSession = try CFSubscriptionSession.CFSubscriptionSessionBuilder()
+                .setEnvironment(environment)
+                .setSubscriptionId(session["subscription_id"] ?? "")
+                .setSubscriptionSessionId(session["subscription_session_id"] ?? "")
+                .build()
+            
+            return cfSubsSession
         } catch let e {
             let err = e as! CashfreeError
             throw err
