@@ -159,7 +159,12 @@ class CFPaymentGatewayService {
           break;
         case "success":
           var data = body["data"] as Map<String, dynamic>;
-          verifyPayment!(data["subscriptionId"] as String);
+          final subscriptionId = data["subscriptionId"] ?? data["order_id"];
+          if (subscriptionId is String && subscriptionId.isNotEmpty) {
+            verifyPayment!(subscriptionId);
+          }else {
+            debugPrint("No valid subscriptionId or order_id found in response.");
+          }
           break;
         case "failed":
           var data = body["data"] as Map<String, dynamic>;
