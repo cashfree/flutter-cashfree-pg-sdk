@@ -1,3 +1,8 @@
+## 2.2.8+46
+
+* Introduced iOS Subscription Checkout flow
+* Upgrade android sdk version 2.2.4
+
 ## 2.2.7+45
 
 * Introduced Android Subscription Checkout flow
