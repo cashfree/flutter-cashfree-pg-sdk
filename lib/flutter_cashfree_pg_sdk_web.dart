@@ -39,25 +39,23 @@ library CFFlutter;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html' as html show window;
-import 'dart:html';
-import 'dart:js';
+import 'package:web/web.dart' as web;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'package:js/js.dart';
+import 'dart:developer' as developer;
 
 import 'api/cferrorresponse/cferrorresponse.dart';
-
 
 external Cashfree get cashfree;
 
 @JS()
 class Cashfree {
   external Cashfree(String paymentSessionId);
-  external void drop(Element element, CFConfig cfConfig);
+  external void drop(web.Element element, CFConfig cfConfig);
   external void redirect();
 }
 
@@ -82,7 +80,7 @@ class FlutterCashfreePgSdkWeb {
   void Function(String)? _verifyPayment;
   void Function(CFErrorResponse, String)? _onError;
 
-  DivElement? _outerDiv;
+  web.HTMLDivElement? _outerDiv;
   String? _order_id;
 
   static void registerWith(Registrar registrar) {
@@ -118,7 +116,6 @@ class FlutterCashfreePgSdkWeb {
         );
     }
   }
-
 
   void onSuccess(String data) {
     var jsonObject = json.decode(data) as Map<String, dynamic>;
@@ -157,8 +154,7 @@ class FlutterCashfreePgSdkWeb {
   }
 
   void _showToast(String message) {
-
-    DivElement toast = DivElement();
+    final toast = web.document.createElement('div') as web.HTMLDivElement;
     toast.text = message;
     toast.style.visibility = "visible";
     toast.style.minWidth = "200px";
@@ -194,45 +190,45 @@ class FlutterCashfreePgSdkWeb {
 
   /// WEB REDIRECTION
   void doWebPayment(dynamic arguments) {
-    var window = html.window;
-    var document = window.document;
+    final window = web.window;
+    final document = window.document;
 
     var session = arguments["session"] as dynamic;
 
     String environment = session["environment"] as String;
     String paymentSessionId = session["payment_session_id"] as String;
 
-    var script = document.createElement("SCRIPT") as ScriptElement;
-    if(environment == "SANDBOX") {
+    var script = document.createElement("script") as web.HTMLScriptElement;
+    if (environment == "SANDBOX") {
       script.src =
-      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
+          "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
     } else {
-      script.src =
-      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
+      script.src = "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
     }
     script.onLoad.first.then((value) {
       var c = Cashfree(paymentSessionId);
       c.redirect();
     });
-    document.querySelector("body")?.children.add(script);
+    document.querySelector("body")?.append(script);
   }
 
   /// WEB
   void doPayment(dynamic arguments) async {
-    var window = html.window;
-    var document = window.document;
+    final window = web.window;
+    final document = window.document;
 
-    window.onHashChange.first.then((value) {
-      _userCancelledTransaction();
-    });
+    window.addEventListener(
+        'hashchange',
+        allowInterop((web.Event _) {
+          _userCancelledTransaction();
+        }) as web.EventListener);
 
     var session = arguments["session"] as dynamic;
     var orderId = session["order_id"] as String;
     _order_id = orderId;
 
-
     /// Adding this outer div for opaque background
-    DivElement outerDiv = DivElement();
+    final outerDiv = document.createElement('div') as web.HTMLDivElement;
     outerDiv.id = "cf-outer-div";
     outerDiv.style.position = "fixed";
     outerDiv.style.width = "100%";
@@ -243,7 +239,7 @@ class FlutterCashfreePgSdkWeb {
     outerDiv.style.zIndex = "9999";
 
     /// This div element has the js sdk
-    DivElement sdkDiv = DivElement();
+    final sdkDiv = document.createElement('div') as web.HTMLDivElement;
     sdkDiv.id = "cf-flutter-placeholder";
     sdkDiv.style.position = "fixed";
     sdkDiv.style.left = "50%";
@@ -257,7 +253,7 @@ class FlutterCashfreePgSdkWeb {
     outerDiv.append(sdkDiv);
 
     /// This div element has the cross mark to close the sdk
-    DivElement closeButton = DivElement();
+    final closeButton = document.createElement('div') as web.HTMLDivElement;
     closeButton.text = "X";
     closeButton.style.position = "fixed";
     closeButton.style.right = "10px";
@@ -265,14 +261,14 @@ class FlutterCashfreePgSdkWeb {
     closeButton.style.fontSize = "24px";
     closeButton.style.color = "#ff0000";
     sdkDiv.append(closeButton);
-    closeButton.onClick.listen((event) {
-      _userCancelledTransaction();
-    });
+    closeButton.addEventListener(
+        'click',
+        allowInterop((web.Event _) {
+          developer.log('closeButton Clicked');
+          _userCancelledTransaction();
+        }) as web.EventListener);
 
-    document
-        .querySelector("body")
-        ?.children
-        .add(outerDiv);
+    document.querySelector("body")?.append(outerDiv);
 
     /// Taking an instance of outer div to close it later
     _outerDiv = outerDiv;
@@ -312,25 +308,29 @@ class FlutterCashfreePgSdkWeb {
       "theme": "light"
     };
 
-    var script = document.createElement("SCRIPT") as ScriptElement;
-    if(environment == "SANDBOX") {
+    var script = document.createElement("script") as web.HTMLScriptElement;
+    if (environment == "SANDBOX") {
       script.src =
-      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
+          "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
     } else {
-      script.src =
-      "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
+      script.src = "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
     }
     script.onLoad.first.then((value) {
       var c = Cashfree(paymentSessionId);
 
-      var element = document.getElementById("cf-flutter-placeholder") as Element;
+      var element =
+          document.getElementById("cf-flutter-placeholder") as web.Element;
       var os = allowInterop(onSuccess);
       var of = allowInterop(onFailure);
 
-      var cfConfig = CFConfig(components: componentsToSend, pluginName: "jflt-d-2.0.10-3.3.10", onFailure: of, onSuccess: os, style: style);
+      var cfConfig = CFConfig(
+          components: componentsToSend,
+          pluginName: "jflt-d-2.0.10-3.3.10",
+          onFailure: of,
+          onSuccess: os,
+          style: style);
       c.drop(element, cfConfig);
     });
-    document.querySelector("body")?.children.add(script);
+    document.querySelector("body")?.append(script);
   }
-
 }
