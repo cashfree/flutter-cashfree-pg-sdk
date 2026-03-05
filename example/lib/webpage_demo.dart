@@ -18,10 +18,10 @@ class PaymentTestPage extends StatelessWidget {
               onPressed: () {
                 sdk.doWebPayment({
                   "session": {
-                    "order_id": "devstudio_7360984143259511930",
+                    "order_id": "devstudio_7399366199638283385",
                     "environment": "SANDBOX",
                     "payment_session_id":
-                        "session_oYPv3Q25MxYjGBC8tnaJvgiAbUhl6gpx825zBg6PK0Ge6fO9GlxvsvsSslRwrID0NysrRBX0HExgAQj90Y0Pg2CO90rIMkKtogKR8r2KKTQQTDQjd837sBsCNikpayment"
+                        "session_zhSMCaiBnGBIeGhid2yREJyLEwWt4Cu369VfhcUntBs-aNhD6pcN9eLhBlQ6fPGaLaQxAkg_G-jNKOQ2m1PLsm0HYSXVI4Oa4dXae7uSE5A3-gadq5SLJ-CeFIQpayment"
                   }
                 });
               },

@@ -19,10 +19,10 @@ dependencies:
     sdk: flutter
 
   flutter_cashfree_pg_sdk: #^2.2.9
-#    path: ../
-    git:
-      url: https://github.com/cashfree/flutter-cashfree-pg-sdk.git
-      ref: feature/dart_web_migration
+    path: ../
+#    git:
+#      url: https://github.com/cashfree/flutter-cashfree-pg-sdk.git
+#      ref: feature/dart_web_migration
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

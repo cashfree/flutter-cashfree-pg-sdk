@@ -45,31 +45,48 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
-import 'package:js/js.dart';
+import 'dart:js_interop';
 import 'dart:developer' as developer;
 
 import 'api/cferrorresponse/cferrorresponse.dart';
 
-external Cashfree get cashfree;
-
 @JS()
+@staticInterop
 class Cashfree {
-  external Cashfree(String paymentSessionId);
+  external factory Cashfree(String paymentSessionId);
+}
+
+extension CashfreeExt on Cashfree {
   external void drop(web.Element element, CFConfig cfConfig);
   external void redirect();
 }
 
 @JS()
+@staticInterop
 @anonymous
 class CFConfig {
-  external List<String> get components;
-  external String get orderToken;
-  external String get pluginName;
-  external Map<String, String> get style;
-  external Function(dynamic) get onSuccess;
-  external Function(dynamic) get onFailure;
+  external factory CFConfig({
+    JSArray<JSString> components,
+    String orderToken,
+    String pluginName,
+    Style style,
+    JSFunction onSuccess,
+    JSFunction onFailure,
+  });
+}
 
-  external factory CFConfig({List<String> components, String orderToken, String pluginName, Map<String, String> style, Function onSuccess, Function onFailure});
+@JS()
+@staticInterop
+@anonymous
+class Style {
+  external factory Style({
+    String backgroundColor,
+    String color,
+    String fontFamily,
+    String fontSize,
+    String errorColor,
+    String theme,
+  });
 }
 
 /// A web implementation of the FlutterCashfreePgSdkPlatform of the FlutterCashfreePgSdk plugin.
@@ -156,20 +173,21 @@ class FlutterCashfreePgSdkWeb {
   void _showToast(String message) {
     final toast = web.document.createElement('div') as web.HTMLDivElement;
     toast.text = message;
-    toast.style.visibility = "visible";
-    toast.style.minWidth = "200px";
-    toast.style.position = "fixed";
-    toast.style.left = "50%";
-    toast.style.transform = "translate(-50%)";
-    toast.style.top = "7.5%";
-    toast.style.background = "red";
-    toast.style.color = "white";
-    toast.style.textAlign = "center";
-    toast.style.verticalAlign = "middle";
-    toast.style.lineHeight = "27px";
-    toast.style.fontSize = "14px";
-    toast.style.borderRadius = "5px";
-    toast.style.padding = "8px";
+    toast.style
+      ..visibility = "visible"
+      ..minWidth = "200px"
+      ..position = "fixed"
+      ..left = "50%"
+      ..transform = "translate(-50%)"
+      ..top = "7.5%"
+      ..background = "red"
+      ..color = "white"
+      ..textAlign = "center"
+      ..verticalAlign = "middle"
+      ..lineHeight = "27px"
+      ..fontSize = "14px"
+      ..borderRadius = "5px"
+      ..padding = "8px";
     _outerDiv?.append(toast);
 
     Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -219,9 +237,10 @@ class FlutterCashfreePgSdkWeb {
 
     window.addEventListener(
         'hashchange',
-        allowInterop((web.Event _) {
+        ((web.Event _) {
           _userCancelledTransaction();
-        }) as web.EventListener);
+        }).toJS);
+
 
     var session = arguments["session"] as dynamic;
     var orderId = session["order_id"] as String;
@@ -230,26 +249,27 @@ class FlutterCashfreePgSdkWeb {
     /// Adding this outer div for opaque background
     final outerDiv = document.createElement('div') as web.HTMLDivElement;
     outerDiv.id = "cf-outer-div";
-    outerDiv.style.position = "fixed";
-    outerDiv.style.width = "100%";
-    outerDiv.style.height = "100%";
-    outerDiv.style.top = "0";
-    outerDiv.style.left = "0";
-    outerDiv.style.background = "#6b6c7b80";
-    outerDiv.style.zIndex = "9999";
+    outerDiv.style
+      ..position = "fixed"
+      ..width = "100%"
+      ..height = "100%"
+      ..top = "0"
+      ..left = "0"
+      ..background = "#6b6c7b80"
+      ..zIndex = "9999";
 
     /// This div element has the js sdk
     final sdkDiv = document.createElement('div') as web.HTMLDivElement;
     sdkDiv.id = "cf-flutter-placeholder";
-    sdkDiv.style.position = "fixed";
-    sdkDiv.style.left = "50%";
-    sdkDiv.style.top = "50%";
-    sdkDiv.style.width = "400px";
-    // sdkDiv.style.minHeight = "350px";
-    sdkDiv.style.height = "100%";
-    sdkDiv.style.maxWidth = "100%";
-    sdkDiv.style.transform = "translate(-50%, -50%)";
-    sdkDiv.style.overflow = "auto";
+    sdkDiv.style
+      ..position = "fixed"
+      ..left = "50%"
+      ..top = "50%"
+      ..width = "400px"
+      ..height = "100%"
+      ..maxWidth = "100%"
+      ..transform = "translate(-50%, -50%)"
+      ..overflow = "auto";
     outerDiv.append(sdkDiv);
 
     /// This div element has the cross mark to close the sdk
@@ -263,10 +283,10 @@ class FlutterCashfreePgSdkWeb {
     sdkDiv.append(closeButton);
     closeButton.addEventListener(
         'click',
-        allowInterop((web.Event _) {
+        ((web.Event _) {
           developer.log('closeButton Clicked');
           _userCancelledTransaction();
-        }) as web.EventListener);
+        }).toJS);
 
     document.querySelector("body")?.append(outerDiv);
 
@@ -294,19 +314,15 @@ class FlutterCashfreePgSdkWeb {
       }
     }
 
-    var theme = arguments["theme"] as dynamic;
-    String backgroundColor = theme["navigationBarBackgroundColor"] as String;
-    String color = theme["navigationBarTextColor"] as String;
-    String font = theme ["primaryFont"] as String;
-
-    var style = {
-      "backgroundColor": backgroundColor,
-      "color": color,
-      "fontFamily": font,
-      "fontSize": "14px",
-      "errorColor": "#ff0000",
-      "theme": "light"
-    };
+    final theme = arguments['theme'] as Map<String, dynamic>;
+    final style = Style(
+      backgroundColor: (theme['navigationBarBackgroundColor'] as String?) ?? '',
+      color: (theme['navigationBarTextColor'] as String?) ?? '',
+      fontFamily: (theme['primaryFont'] as String?) ?? '',
+      fontSize: '14px',
+      errorColor: '#ff0000',
+      theme: 'light',
+    );
 
     var script = document.createElement("script") as web.HTMLScriptElement;
     if (environment == "SANDBOX") {
@@ -320,11 +336,17 @@ class FlutterCashfreePgSdkWeb {
 
       var element =
           document.getElementById("cf-flutter-placeholder") as web.Element;
-      var os = allowInterop(onSuccess);
-      var of = allowInterop(onFailure);
+
+      // Pass Dart callbacks to JS using `.toJS`.
+      final os = ((String data) => onSuccess(data)).toJS;
+      final of = ((String data) => onFailure(data)).toJS;
+
+      final jsComponents = componentsToSend.map((s) => s.toJS).toList().toJS;
+
+
 
       var cfConfig = CFConfig(
-          components: componentsToSend,
+          components: jsComponents,
           pluginName: "jflt-d-2.0.10-3.3.10",
           onFailure: of,
           onSuccess: os,
