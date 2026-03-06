@@ -1,3 +1,9 @@
+## 2.2.10+48
+
+* Upgrade android sdk version 2.2.9
+* Upgrade ios sdk version 2.2.7
+* Support for new iOS PSP apps
+
 ## 2.2.9+47
 
 * Android SDK compatibility with API level 35
