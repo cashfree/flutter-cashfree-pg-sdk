@@ -39,7 +39,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
-    private let versionNumber = "2.2.9"
+    private let versionNumber = "2.2.10"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())

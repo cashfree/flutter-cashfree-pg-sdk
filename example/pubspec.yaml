@@ -18,11 +18,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_cashfree_pg_sdk: #^2.2.9
-    path: ../
-#    git:
-#      url: https://github.com/cashfree/flutter-cashfree-pg-sdk.git
-#      ref: feature/dart_web_migration
+  flutter_cashfree_pg_sdk:
+    # When depending on this package from a real application you should use:
+    #flutter_cashfree_pg_sdk: ^2.2.8
+    # See https://dart.dev/tools/pub/dependencies#version-constraints
+    # The example app is bundled with the plugin so we use a path dependency on
+    # the parent directory to use the current plugin's version.
+    #path: ../
+    git:
+      url: https://github.com/cashfree/flutter-cashfree-pg-sdk.git
+      ref: feature/sdk_version_update
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
