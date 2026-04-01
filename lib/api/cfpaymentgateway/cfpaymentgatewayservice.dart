@@ -11,6 +11,9 @@ import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfsubscriptioncheckoutpaym
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubscardpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubsnetbankingpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubsupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 
@@ -88,6 +91,12 @@ class CFPaymentGatewayService {
       } else if (cfPayment is CFSubscriptionPayment) {
         CFSubscriptionPayment cfSubscriptionPayment = cfPayment;
         data = _convertToSubscriptionCheckoutMap(cfSubscriptionPayment);
+      } else if (cfPayment is CFSubsUPIPayment) {
+        data = _convertToSubsUPIMap(cfPayment);
+      } else if (cfPayment is CFSubsNetbankingPayment) {
+        data = _convertToSubsNetbankingMap(cfPayment);
+      } else if (cfPayment is CFSubsCardPayment) {
+        data = _convertToSubsCardMap(cfPayment);
       }
 
       // Create Method channel here
@@ -117,6 +126,18 @@ class CFPaymentGatewayService {
         });
       } else if (cfPayment is CFSubscriptionPayment) {
         methodChannel.invokeMethod("doSubscriptionPayment", data).then((value) {
+          responseSubscriptionMethod(value);
+        });
+      } else if (cfPayment is CFSubsUPIPayment) {
+        methodChannel.invokeMethod("doSubsUPIPayment", data).then((value) {
+          responseSubscriptionMethod(value);
+        });
+      } else if (cfPayment is CFSubsNetbankingPayment) {
+        methodChannel.invokeMethod("doSubsNetbankingPayment", data).then((value) {
+          responseSubscriptionMethod(value);
+        });
+      } else if (cfPayment is CFSubsCardPayment) {
+        methodChannel.invokeMethod("doSubsCardPayment", data).then((value) {
           responseSubscriptionMethod(value);
         });
       }
@@ -371,6 +392,68 @@ class CFPaymentGatewayService {
       "theme": theme
     };
     return data;
+  }
+
+  Map<String, dynamic> _convertToSubsUPIMap(CFSubsUPIPayment cfSubsUPIPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfSubsUPIPayment.getSession().getEnvironment(),
+      "subscription_id": cfSubsUPIPayment.getSession().getSubscriptionId(),
+      "subscription_session_id": cfSubsUPIPayment.getSession().getSubscriptionSessionID(),
+    };
+
+    Map<String, String> upi = {
+      "channel": "intent",
+      "upi_id": cfSubsUPIPayment.getUPI().getUPIID(),
+    };
+
+    return {
+      "session": session,
+      "upi": upi,
+    };
+  }
+
+  Map<String, dynamic> _convertToSubsNetbankingMap(CFSubsNetbankingPayment cfSubsNetbankingPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfSubsNetbankingPayment.getSession().getEnvironment(),
+      "subscription_id": cfSubsNetbankingPayment.getSession().getSubscriptionId(),
+      "subscription_session_id": cfSubsNetbankingPayment.getSession().getSubscriptionSessionID(),
+    };
+
+    Map<String, String> netbanking = {
+      "channel": cfSubsNetbankingPayment.getNetbanking().getChannel(),
+      "auth_mode": cfSubsNetbankingPayment.getNetbanking().getAuthMode(),
+      "account_holder_name": cfSubsNetbankingPayment.getNetbanking().getAccountHolderName(),
+      "account_number": cfSubsNetbankingPayment.getNetbanking().getAccountNumber(),
+      "account_type": cfSubsNetbankingPayment.getNetbanking().getAccountType(),
+      "account_bank_code": cfSubsNetbankingPayment.getNetbanking().getAccountBankCode(),
+    };
+
+    return {
+      "session": session,
+      "net_banking": netbanking,
+    };
+  }
+
+  Map<String, dynamic> _convertToSubsCardMap(CFSubsCardPayment cfSubsCardPayment) {
+    Map<String, dynamic> session = {
+      "environment": cfSubsCardPayment.getSession().getEnvironment(),
+      "subscription_id": cfSubsCardPayment.getSession().getSubscriptionId(),
+      "subscription_session_id": cfSubsCardPayment.getSession().getSubscriptionSessionID(),
+    };
+
+    Map<String, String> card = {
+      "channel": cfSubsCardPayment.getCard().getChannel(),
+      "card_number": cfSubsCardPayment.getCard().getCardNumber(),
+      "card_holder_name": cfSubsCardPayment.getCard().getCardHolderName(),
+      "card_expiry_mm": cfSubsCardPayment.getCard().getCardExpiryMM(),
+      "card_expiry_yy": cfSubsCardPayment.getCard().getCardExpiryYY(),
+      "card_cvv": cfSubsCardPayment.getCard().getCardCVV(),
+    };
+
+    return {
+      "session": session,
+      "card": card,
+    };
   }
 
   _createErrorResponse(String? message, String? code, String? type, String? orderId) {

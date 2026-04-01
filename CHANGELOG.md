@@ -1,3 +1,11 @@
+## 2.3.2+49
+
+* Upgrade android sdk version 2.3.2
+* Upgrade ios sdk version 2.3.2
+* Support for new iOS PSP apps
+* Subscription Element API Support
+
+
 ## 2.2.10+48
 
 * Upgrade android sdk version 2.2.9

@@ -39,7 +39,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
-    private let versionNumber = "2.2.10"
+    private let versionNumber = "2.3.2"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())
@@ -225,6 +225,69 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 let err = e as! CashfreeError
                 self.sendException(message: err.localizedDescription)
             }
+        } else if method == "doSubsUPIPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            let upi = args["upi"] as? Dictionary<String, String> ?? [:]
+            do {
+                let finalSession = try self.createSubscriptionSession(session: session)
+                let cfSubsUPI = try self.createSubsUPI(upi: upi)
+                let upiSubsPayment = try CFUPISubsPayment.CFUPIPaymentSubsBuilder()
+                    .setSession(finalSession)
+                    .setUPI(cfSubsUPI)
+                    .build()
+                let systemVersion = UIDevice.current.systemVersion
+                upiSubsPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doSubsPayment(upiSubsPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
+        } else if method == "doSubsNetbankingPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            let netbanking = args["net_banking"] as? Dictionary<String, String> ?? [:]
+            do {
+                let finalSession = try self.createSubscriptionSession(session: session)
+                let cfSubsNetbanking = try self.createSubsNetbanking(netbanking: netbanking)
+                let netbankingSubsPayment = try CFNetbankingSubsPayment.CFNetbankingSubsPaymentBuilder()
+                    .setSession(finalSession)
+                    .setNetbanking(cfSubsNetbanking)
+                    .build()
+                let systemVersion = UIDevice.current.systemVersion
+                netbankingSubsPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doSubsPayment(netbankingSubsPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
+        } else if method == "doSubsCardPayment" {
+            let session = args["session"] as? Dictionary<String, String> ?? [:]
+            let card = args["card"] as? Dictionary<String, String> ?? [:]
+            do {
+                let finalSession = try self.createSubscriptionSession(session: session)
+                let cfSubsCard = try self.createSubsCard(card: card)
+                let cardSubsPayment = try CFCardSubsPayment.CFCardPaymentSubsBuilder()
+                    .setSession(finalSession)
+                    .setCard(cfSubsCard)
+                    .build()
+                let systemVersion = UIDevice.current.systemVersion
+                cardSubsPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    try self.cfPaymentGatewayService.doSubsPayment(cardSubsPayment, viewController: vc)
+                } else {
+                    self.sendException(message: "unable to get an instance of rootViewController")
+                }
+            } catch let e {
+                let err = e as! CashfreeError
+                self.sendException(message: err.localizedDescription)
+            }
         }
     }
     
@@ -348,6 +411,50 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
         }
     }
     
+    private func createSubsUPI(upi: Dictionary<String, String>) throws -> CFUPISubs {
+        do {
+            let cfSubsUPI = try CFUPISubs.CFUPISubsBuilder()
+                .setUPIID(upi["upi_id"] ?? "")
+                .build()
+            return cfSubsUPI
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+
+    private func createSubsNetbanking(netbanking: Dictionary<String, String>) throws -> CFNetBankingSubs {
+        do {
+            let cfSubsNetbanking = try CFNetBankingSubs.CFNetbankingSubsBuilder()
+                .setAuthMode(netbanking["auth_mode"] ?? "")
+                .setBankAccountCode(netbanking["account_bank_code"] ?? "")
+                .setAccountHolderName(netbanking["account_holder_name"] ?? "")
+                .setAccountNumber(netbanking["account_number"] ?? "")
+                .setAccountType(netbanking["account_type"] ?? "")
+                .build()
+            return cfSubsNetbanking
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+
+    private func createSubsCard(card: Dictionary<String, String>) throws -> CFCardSubs {
+        do {
+            let cfSubsCard = try CFCardSubs.CFCardSubsBuilder()
+                .setCardNumber(card["card_number"] ?? "")
+                .setCardHolderName(card["card_holder_name"] ?? "")
+                .setCardExpiryMonth(card["card_expiry_mm"] ?? "")
+                .setCardExpiryYear(card["card_expiry_yy"] ?? "")
+                .setCVV(card["card_cvv"] ?? "")
+                .build()
+            return cfSubsCard
+        } catch let e {
+            let err = e as! CashfreeError
+            throw err
+        }
+    }
+
     private func createCard(card: Dictionary<String, String>) throws -> CFCard {
         do {
             var cardObject: CFCard!
