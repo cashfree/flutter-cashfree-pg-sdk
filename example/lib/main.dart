@@ -480,15 +480,13 @@ class _MyAppState extends State<MyApp> {
     final body = jsonEncode({
       "order_amount": 1.00,
       "order_currency": "INR",
+      "order_id": "devstudio_7445082824618121191",
       "customer_details": {
-        "customer_id": "rand_order_id",
-        "customer_name": "Cashfree Sample",
-        "customer_email": "test@cashfree.digital",
-        "customer_phone": "8474090552"
+        "customer_id": "devstudio_user",
+        "customer_phone": "9876543210"
       },
       "order_meta": {
-        "return_url":
-            "https://www.cashfree.com/devstudio/preview/pg/web/checkout?order_id={order_id}"
+        "return_url": "https://www.cashfree.com/devstudio/preview/pg/seamless?order_id={order_id}"
       },
     });
 

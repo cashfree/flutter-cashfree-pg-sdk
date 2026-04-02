@@ -1,8 +1,3 @@
-// In order to *not* need this ignore, consider extracting the "web" version
-// of your plugin as a separate package, instead of inlining it in the same
-// package as the core of your plugin.
-// ignore: avoid_web_libraries_in_flutter
-
 /**
     Predefining a structure to send back response in json string
     onSuccess
@@ -98,7 +93,8 @@ class FlutterCashfreePgSdkWeb {
   void Function(CFErrorResponse, String)? _onError;
 
   web.HTMLDivElement? _outerDiv;
-  String? _order_id;
+  String? _orderId;
+  JSFunction? _hashChangeListener;
 
   static void registerWith(Registrar registrar) {
     final MethodChannel channel = MethodChannel(
@@ -172,7 +168,7 @@ class FlutterCashfreePgSdkWeb {
 
   void _showToast(String message) {
     final toast = web.document.createElement('div') as web.HTMLDivElement;
-    toast.text = message;
+    toast.textContent =message;
     toast.style
       ..visibility = "visible"
       ..minWidth = "200px"
@@ -197,11 +193,15 @@ class FlutterCashfreePgSdkWeb {
   }
 
   void _userCancelledTransaction() {
+    if (_hashChangeListener != null) {
+      web.window.removeEventListener('hashchange', _hashChangeListener!);
+      _hashChangeListener = null;
+    }
     if(_onError != null) {
       var errorResponse = CFErrorResponse(
           "FAILED", "Transaction cancelled by user", "invalid_request",
           "invalid request");
-      _onError!(errorResponse, _order_id ?? "order_id_not_found");
+      _onError!(errorResponse, _orderId ?? "order_id_not_found");
       _outerDiv?.remove();
     }
   }
@@ -219,7 +219,7 @@ class FlutterCashfreePgSdkWeb {
     var script = document.createElement("script") as web.HTMLScriptElement;
     if (environment == "SANDBOX") {
       script.src =
-          "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
+          "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js";
     } else {
       script.src = "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
     }
@@ -235,16 +235,18 @@ class FlutterCashfreePgSdkWeb {
     final window = web.window;
     final document = window.document;
 
-    window.addEventListener(
-        'hashchange',
-        ((web.Event _) {
-          _userCancelledTransaction();
-        }).toJS);
+    if (_hashChangeListener != null) {
+      window.removeEventListener('hashchange', _hashChangeListener!);
+    }
+    _hashChangeListener = ((web.Event _) {
+      _userCancelledTransaction();
+    }).toJS;
+    window.addEventListener('hashchange', _hashChangeListener!);
 
 
     var session = arguments["session"] as dynamic;
     var orderId = session["order_id"] as String;
-    _order_id = orderId;
+    _orderId = orderId;
 
     /// Adding this outer div for opaque background
     final outerDiv = document.createElement('div') as web.HTMLDivElement;
@@ -274,7 +276,7 @@ class FlutterCashfreePgSdkWeb {
 
     /// This div element has the cross mark to close the sdk
     final closeButton = document.createElement('div') as web.HTMLDivElement;
-    closeButton.text = "X";
+    closeButton.textContent ="X";
     closeButton.style.position = "fixed";
     closeButton.style.right = "10px";
     closeButton.style.top = "10px";
@@ -327,7 +329,7 @@ class FlutterCashfreePgSdkWeb {
     var script = document.createElement("script") as web.HTMLScriptElement;
     if (environment == "SANDBOX") {
       script.src =
-          "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js ";
+          "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.sandbox.js";
     } else {
       script.src = "https://sdk.cashfree.com/js/flutter/2.0.0/cashfree.prod.js";
     }
