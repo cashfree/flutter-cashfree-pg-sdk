@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfcard/cfcardlistener.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfcard/cfcardwidget.dart';
@@ -11,6 +13,12 @@ import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfsubscriptioncheckoutpaym
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupi.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubscard.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubscardpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubsnetbanking.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubsnetbankingpayment.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubsupi.dart';
+import 'package:flutter_cashfree_pg_sdk/api/cfpayment/subs/cfsubsupipayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentcomponents/cfpaymentcomponent.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
@@ -41,6 +49,24 @@ class _MyAppState extends State<MyApp> {
   var clientIDController = TextEditingController();
   var clientSecretController = TextEditingController();
 
+  // Subs UPI
+  var subsUPIIdController = TextEditingController();
+
+  // Subs Netbanking
+  String selectedAuthMode = "net_banking";
+  final List<String> authModeOptions = ["net_banking", "aadhaar", "debit_card"];
+  var subsNBAccountHolderController = TextEditingController(text: "John Doe");
+  var subsNBAccountNumberController = TextEditingController(text: "112233445");
+  var subsNBAccountTypeController = TextEditingController(text: "SAVINGS");
+  var subsNBBankCodeController = TextEditingController(text: "UTIB");
+
+  // Subs Card
+  var subsCardNumberController = TextEditingController(text: "4111111111111111");
+  var subsCardHolderController = TextEditingController(text: "Harshith");
+  var subsCardExpiryMMController = TextEditingController(text: "08");
+  var subsCardExpiryYYController = TextEditingController(text: "32");
+  var subsCardCVVController = TextEditingController(text: "111");
+
   var TAG = "CashfreeFlutterSampleApp";
 
   CFCardWidget? cfCardWidget;
@@ -48,6 +74,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    subsUPIIdController.text = Platform.isAndroid ? "com.phonepe.app" : "phonepe://";
     cfPaymentGatewayService.setCallback(verifyPayment, onError);
     final GlobalKey<CFCardWidgetState> myWidgetKey =
         GlobalKey<CFCardWidgetState>();
@@ -58,16 +85,16 @@ class _MyAppState extends State<MyApp> {
         textStyle: null,
         inputDecoration: InputDecoration(
           hintText: 'XXXX XXXX XXXX XXXX',
-          contentPadding: const EdgeInsets.all(15.0), // Adjust padding as needed
+          contentPadding: const EdgeInsets.all(15.0),
           counterText: "",
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0), // Adjust the radius as needed
+            borderRadius: BorderRadius.circular(5.0),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0), // Adjust the radius as needed
+            borderRadius: BorderRadius.circular(5.0),
             borderSide: const BorderSide(
-              color: Colors.green, // Set your desired tint color here
-              width: 2.0, // Adjust the border width as needed
+              color: Colors.green,
+              width: 2.0,
             ),
           ),
         ),
@@ -92,85 +119,223 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        title: const Text('Cashfree Flutter Sample app'),
-      ),
-      body: Center(
-        child: Builder(
-          builder: (context) => Column(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Cashfree Flutter Sample app'),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Container(
-              //   height: 500,
-              //   width: 500,
-              //   child: WebViewWidget(controller: controller),
-              // )
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: TextField(
-                  controller: clientIDController
-                    ..text = "TEST430329ae80e0f32e41a393d78b923034",
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    hintText: 'Enter AppId',
-                    contentPadding: const EdgeInsets.all(15.0),
+              // Credentials
+              ExpansionTile(
+                title: const Text('Credentials', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                initiallyExpanded: true,
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                children: [
+                  _buildCompactTextField(clientIDController, 'App ID',
+                      defaultText: "TEST430329ae80e0f32e41a393d78b923034"),
+                  const SizedBox(height: 6),
+                  _buildCompactTextField(clientSecretController, 'App Secret',
+                      defaultText: "TESTaf195616268bd6202eeb3bf8dc458956e7192a85"),
+                ],
+              ),
+
+              // Standard Flows
+              ExpansionTile(
+                title: const Text('Standard Flows', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                initiallyExpanded: true,
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                children: [
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 6,
+                    crossAxisSpacing: 6,
+                    childAspectRatio: 4.5,
+                    children: [
+                      _buildGridButton("PG Drop Flow", pay),
+                      _buildGridButton("PG Web Checkout", webCheckout),
+                      _buildGridButton("PG UPI Intent Checkout", upiIntentCheckout),
+                      _buildGridButton("Subs Web Checkout", () => susbcriptionCheckout(context)),
+                      _buildGridButton("PG UPI Collect", upiCollectPay),
+                      _buildGridButton("PG UPI Intent", upiIntentPay),
+                      _buildGridButton("PG Netbanking", netbankingPay),
+                    ],
                   ),
-                ),
+                ],
               ),
-              Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: TextField(
-                    controller: clientSecretController
-                      ..text = "TESTaf195616268bd6202eeb3bf8dc458956e7192a85",
+
+              // PG Card
+              ExpansionTile(
+                title: const Text('PG Card Pay', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                children: [
+                  cfCardWidget!,
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: cardPay,
+                      child: const Text("Pay Now — PG Card"),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Subscription UPI
+              ExpansionTile(
+                title: const Text('Subscription UPI', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                children: [
+                  _buildCompactTextField(
+                    subsUPIIdController,
+                    Platform.isAndroid ? 'PSP Package (e.g. com.phonepe.app)' : 'URI Schema (e.g. phonepe://)',
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: subsUPIPay,
+                      child: const Text("Pay Now — Subs UPI"),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Subscription Netbanking
+              ExpansionTile(
+                title: const Text('Subscription Netbanking', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: selectedAuthMode,
+                    isDense: true,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      hintText: 'Enter App Secret',
-                      contentPadding: const EdgeInsets.all(15.0),
+                      labelText: 'Auth Mode',
+                      labelStyle: const TextStyle(fontSize: 12),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                     ),
-                  )),
-              TextButton(onPressed: pay, child: const Text("Drop Pay flow")),
-              TextButton(
-                  onPressed: webCheckout,
-                  child: const Text("Web Checkout Flow")),
-              TextButton(
-                  onPressed: upiIntentCheckout,
-                  child: const Text("UPI Intent Checkout")),
-              TextButton(
-                  onPressed: () => susbcriptionCheckout(context),
-                  child: const Text("Subscription Web Checkout Flow")),
-              cfCardWidget!,
-              TextButton(onPressed: cardPay, child: const Text("Card Pay")),
-              TextButton(
-                  onPressed: upiCollectPay,
-                  child: const Text("UPI Collect Pay")),
-              TextButton(
-                  onPressed: upiIntentPay, child: const Text("UPI Intent Pay")),
-              TextButton(
-                  onPressed: netbankingPay,
-                  child: const Text("Netbanking Pay")),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentTestPage(),
+                    items: authModeOptions
+                        .map((mode) => DropdownMenuItem(value: mode, child: Text(mode, style: const TextStyle(fontSize: 12))))
+                        .toList(),
+                    onChanged: (value) => setState(() => selectedAuthMode = value!),
+                  ),
+                  const SizedBox(height: 6),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 6,
+                    crossAxisSpacing: 6,
+                    childAspectRatio: 3.2,
+                    children: [
+                      _buildGridTextField(subsNBAccountHolderController, 'Account Holder'),
+                      _buildGridTextField(subsNBAccountNumberController, 'Account Number'),
+                      _buildGridTextField(subsNBAccountTypeController, 'Account Type'),
+                      _buildGridTextField(subsNBBankCodeController, 'Bank Code'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: subsNetbankingPay,
+                      child: const Text("Pay Now — Subs Netbanking"),
                     ),
-                  );
-                },
-                child: const Text('Open Web Dart Page Demo'),
+                  ),
+                ],
               ),
+
+              // Subscription Card
+              ExpansionTile(
+                title: const Text('Subscription Card', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                children: [
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 6,
+                    crossAxisSpacing: 6,
+                    childAspectRatio: 3.2,
+                    children: [
+                      _buildGridTextField(subsCardNumberController, 'Card Number'),
+                      _buildGridTextField(subsCardHolderController, 'Card Holder'),
+                      _buildGridTextField(subsCardExpiryMMController, 'Expiry MM'),
+                      _buildGridTextField(subsCardExpiryYYController, 'Expiry YY'),
+                      _buildGridTextField(subsCardCVVController, 'CVV'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: subsCardPay,
+                      child: const Text("Pay Now — Subs Card"),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-    ));
+    );
   }
 
-  // "var cardNumber = document.createElement('div');\ncardNumber.id = \"cardNumber\";\nvar cardCvv = document.createElement('div');\ncardCvv.id = \"cardCvv\";\nvar cardExpiry = document.createElement('div');\ncardExpiry.id = \"cardExpiry\";\nvar cardHolder = document.createElement('div');\ncardHolder.id = \"cardHolder\";\nvar payButton = document.createElement('button');\npayButton.id = \"payButton\";\n\n\nconst cashfree = await load({ \n      mode: \"sandbox\", //or production\n    });\n\n    const cardComponent = cashfree.create(\"cardNumber\", {});\n    cardComponent.mount(\"#cardNumber\");\n\n    const cardCvv = cashfree.create(\"cardCvv\", {});\n    cardCvv.mount(\"#cardCvv\");\n\n    const cardExpiry = cashfree.create(\"cardExpiry\", {});\n    cardExpiry.mount(\"#cardExpiry\");\n\n    const cardHolder = cashfree.create(\"cardHolder\", {});\n    cardHolder.mount(\"#cardHolder\");\n\n    const showError = function(e){\n      alert(e.message)\n    }\n\n    document.querySelector(\"#payBtn\").addEventListener(\"click\", async () => {\n      cashfree.pay({\n        paymentMethod: cardComponent,\n        paymentSessionId: \"yourPaymentSession\",\n        returnUrl: \"https://merchantsite.com/return?order_id={order_id}\",\n      }).then(function (data) {\n        if (data != null && data.error) {\n          return showError(data.error)\n        }\n      });\n    })"
+  Widget _buildCompactTextField(TextEditingController controller, String hint, {String? defaultText}) {
+    if (defaultText != null && controller.text.isEmpty) {
+      controller.text = defaultText;
+    }
+    return TextField(
+      controller: controller,
+      style: const TextStyle(fontSize: 12),
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+        hintText: hint,
+        hintStyle: const TextStyle(fontSize: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+        isDense: true,
+      ),
+    );
+  }
+
+  Widget _buildGridTextField(TextEditingController controller, String hint) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(fontSize: 12),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(fontSize: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+        isDense: true,
+      ),
+    );
+  }
+
+  Widget _buildGridButton(String label, VoidCallback onPressed) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        minimumSize: Size.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
+      ),
+      child: Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11)),
+    );
+  }
 
   void verifyPayment(String orderId) {
     print("$TAG --------Verify Payment ===> $orderId" );
@@ -194,26 +359,102 @@ class _MyAppState extends State<MyApp> {
   String paymentSessionId =
       "session_Box0WGk2C4RgEItAmk0mOhYAikmLzkdJ3k8rjQ74dy4AIoFu-WHDmLZ8BxJOaK3KC3GmnMX31KJ98Ei_y51EEG-w7CKJxOKB9Cm6-M58CQIFGliIZnSAHWEHtX8payment";
 
-  void receivedEvent(String event_name, Map<dynamic, dynamic> meta_data) {
-    print(event_name);
-    print(meta_data);
-  }
-
   CFEnvironment environment = CFEnvironment.SANDBOX;
   String upiPackageName = "";
+
+  // ─── Subscription UPI ────────────────────────────────────────────────────────
+
+  subsUPIPay() async {
+    try {
+      cfPaymentGatewayService.setCallback(onSubscriptionVerify, onSubscriptionFailure);
+      var session = await createSubscriptionSession();
+      if (session == null) {
+        showToast("Subscription Session creation failed");
+        return;
+      }
+      var subsUPI = CFSubsUPIBuilder()
+          .setChannel(CFSubsUPIChannel.INTENT)
+          .setUPIID(subsUPIIdController.text)
+          .build();
+      var subsUPIPayment = CFSubsUPIPaymentBuilder()
+          .setSession(session)
+          .setUPI(subsUPI)
+          .build();
+      cfPaymentGatewayService.doPayment(subsUPIPayment);
+    } on CFException catch (e) {
+      print(e.message);
+      showToast(e.message);
+    }
+  }
+
+  // ─── Subscription Netbanking ─────────────────────────────────────────────────
+
+  subsNetbankingPay() async {
+    try {
+      cfPaymentGatewayService.setCallback(onSubscriptionVerify, onSubscriptionFailure);
+      var session = await createSubscriptionSession();
+      if (session == null) {
+        showToast("Subscription Session creation failed");
+        return;
+      }
+      var subsNetbanking = CFSubsNetbankingBuilder()
+          .setAuthMode(selectedAuthMode)
+          .setAccountHolderName(subsNBAccountHolderController.text)
+          .setAccountNumber(subsNBAccountNumberController.text)
+          .setAccountType(subsNBAccountTypeController.text)
+          .setAccountBankCode(subsNBBankCodeController.text)
+          .build();
+      var subsNetbankingPayment = CFSubsNetbankingPaymentBuilder()
+          .setSession(session)
+          .setNetbanking(subsNetbanking)
+          .build();
+      cfPaymentGatewayService.doPayment(subsNetbankingPayment);
+    } on CFException catch (e) {
+      print(e.message);
+      showToast(e.message);
+    }
+  }
+
+  // ─── Subscription Card ───────────────────────────────────────────────────────
+
+  subsCardPay() async {
+    try {
+      cfPaymentGatewayService.setCallback(onSubscriptionVerify, onSubscriptionFailure);
+      var session = await createSubscriptionSession();
+      if (session == null) {
+        showToast("Subscription Session creation failed");
+        return;
+      }
+      var subsCard = CFSubsCardBuilder()
+          .setCardNumber(subsCardNumberController.text)
+          .setCardHolderName(subsCardHolderController.text)
+          .setCardExpiryMM(subsCardExpiryMMController.text)
+          .setCardExpiryYY(subsCardExpiryYYController.text)
+          .setCardCVV(subsCardCVVController.text)
+          .build();
+      var subsCardPayment = CFSubsCardPaymentBuilder()
+          .setSession(session)
+          .setCard(subsCard)
+          .build();
+      cfPaymentGatewayService.doPayment(subsCardPayment);
+    } on CFException catch (e) {
+      print(e.message);
+      showToast(e.message);
+    }
+  }
+
+  // ─── Existing flows ──────────────────────────────────────────────────────────
 
   upiIntentCheckout() async {
     try {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
       var upi = CFUPIBuilder().setChannel(CFUPIChannel.INTENT_WITH_UI).build();
-      var upiPayment =
-          CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
+      var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
     } on CFException catch (e) {
       print(e.message);
@@ -225,7 +466,6 @@ class _MyAppState extends State<MyApp> {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
@@ -233,8 +473,7 @@ class _MyAppState extends State<MyApp> {
           .setChannel(CFUPIChannel.COLLECT)
           .setUPIID("testfailure@gocash")
           .build();
-      var upiPayment =
-          CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
+      var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
     } on CFException catch (e) {
       print(e.message);
@@ -246,12 +485,10 @@ class _MyAppState extends State<MyApp> {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
-      var netbanking =
-          CFNetbankingBuilder().setChannel("link").setBankCode(3003).build();
+      var netbanking = CFNetbankingBuilder().setChannel("link").setBankCode(3003).build();
       var netbankingPayment = CFNetbankingPaymentBuilder()
           .setSession(session!)
           .setNetbanking(netbanking)
@@ -267,7 +504,6 @@ class _MyAppState extends State<MyApp> {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
@@ -275,8 +511,7 @@ class _MyAppState extends State<MyApp> {
           .setChannel(CFUPIChannel.INTENT)
           .setUPIID(upiPackageName)
           .build();
-      var upiPayment =
-          CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
+      var upiPayment = CFUPIPaymentBuilder().setSession(session!).setUPI(upi).build();
       cfPaymentGatewayService.doPayment(upiPayment);
     } on CFException catch (e) {
       print(e.message);
@@ -288,7 +523,6 @@ class _MyAppState extends State<MyApp> {
       cfPaymentGatewayService.setCallback(verifyPayment, onError);
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
@@ -314,27 +548,22 @@ class _MyAppState extends State<MyApp> {
     try {
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
       List<CFPaymentModes> components = <CFPaymentModes>[];
       components.add(CFPaymentModes.UPI);
-      var paymentComponent =
-          CFPaymentComponentBuilder().setComponents(components).build();
-
+      var paymentComponent = CFPaymentComponentBuilder().setComponents(components).build();
       var theme = CFThemeBuilder()
           .setNavigationBarBackgroundColorColor("#FF0000")
           .setPrimaryFont("Menlo")
           .setSecondaryFont("Futura")
           .build();
-
       var cfDropCheckoutPayment = CFDropCheckoutPaymentBuilder()
           .setSession(session!)
           .setPaymentComponent(paymentComponent)
           .setTheme(theme)
           .build();
-
       cfPaymentGatewayService.doPayment(cfDropCheckoutPayment);
     } on CFException catch (e) {
       print(e.message);
@@ -343,12 +572,10 @@ class _MyAppState extends State<MyApp> {
 
   CFSession? createSession() {
     try {
-      String oid = orderId;
-      String spi = paymentSessionId;
       var session = CFSessionBuilder()
           .setEnvironment(environment)
-          .setOrderId(oid)
-          .setPaymentSessionId(spi)
+          .setOrderId(orderId)
+          .setPaymentSessionId(paymentSessionId)
           .build();
       return session;
     } on CFException catch (e) {
@@ -357,27 +584,14 @@ class _MyAppState extends State<MyApp> {
     return null;
   }
 
-  newPay() async {
-    cfPaymentGatewayService = CFPaymentGatewayService();
-    cfPaymentGatewayService.setCallback((p0) async {
-      print(p0);
-    }, (p0, p1) async {
-      print(p0);
-      print(p1);
-    });
-    webCheckout();
-  }
-
   webCheckout() async {
     try {
       var session = await createPaymentSession();
       if (session == null) {
-        print("$TAG -------- Order creation failed");
         showToast("Order Session creation failed");
         return;
       }
-      var cfWebCheckout =
-          CFWebCheckoutPaymentBuilder().setSession(session!).build();
+      var cfWebCheckout = CFWebCheckoutPaymentBuilder().setSession(session!).build();
       cfPaymentGatewayService.doPayment(cfWebCheckout);
     } on CFException catch (e) {
       print(e.message);
@@ -386,11 +600,9 @@ class _MyAppState extends State<MyApp> {
 
   susbcriptionCheckout(BuildContext context) async {
     try {
-      cfPaymentGatewayService.setCallback(
-          onSubscriptionVerify, onSubscriptionFailure);
+      cfPaymentGatewayService.setCallback(onSubscriptionVerify, onSubscriptionFailure);
       var session = await createSubscriptionSession();
       if (session == null) {
-        print("$TAG -------- Subscription Session creation failed");
         showToast("Subscription Session creation failed");
         return;
       }
@@ -408,6 +620,8 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  // ─── Session creation ─────────────────────────────────────────────────────────
+
   Future<CFSubscriptionSession?> createSubscriptionSession() async {
     const uuid = Uuid();
     final String subscriptionId = 'sub_${uuid.v4()}';
@@ -416,53 +630,52 @@ class _MyAppState extends State<MyApp> {
     final headers = {
       'accept': 'application/json',
       'content-type': 'application/json',
-      'x-api-version': '2023-08-01',
+      'x-api-version': '2025-01-01',
       'x-client-id': clientIDController.text,
       'x-client-secret': clientSecretController.text,
     };
 
     final body = jsonEncode({
+      "subscription_id": subscriptionId,
       "customer_details": {
-        "customer_name": "Mukul Jain",
-        "customer_email": "mukul.jain@cashfree.com",
-        "customer_phone": "8810643608"
+        "customer_name": "Harshith",
+        "customer_email": "test@cashfree.com",
+        "customer_phone": "9876543210"
       },
-      "plan_details": {"plan_id": "plan_12344"},
+      "plan_details": {
+        "plan_name": "devstudio_subs_plan",
+        "plan_type": "ON_DEMAND",
+        "plan_currency": "INR",
+        "plan_amount": 1,
+        "plan_max_amount": 100,
+        "plan_max_cycles": 0,
+        "plan_note": "on demand INR 1 plan"
+      },
       "authorization_details": {
         "authorization_amount": 1,
         "authorization_amount_refund": true
       },
       "subscription_meta": {
-        "return_url": "https://wa.me/9512440440?text=Payment%20Successfull",
-        "notification_channel": ["EMAIL", "SMS"]
+        "return_url": "https://www.cashfree.com/devstudio/preview/subs/seamless"
       },
-      "subscription_id": subscriptionId,
-      "subscription_note": "testSUBB",
-      "subscription_expiry_time": "2026-01-14T23:00:08+05:30",
-      "notificationChannels": ["EMAIL", "SMS"]
+      "subscription_expiry_time": "2027-03-31T10:19:58.227Z"
     });
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        final subscriptionSessionId = data['subscription_session_id'];
-        final subscriptionId = data['subscription_id'];
-        var subsriptionSession = CFSubscriptionSessionBuilder()
+        return CFSubscriptionSessionBuilder()
             .setEnvironment(environment)
-            .setSubscriptionId(subscriptionId)
-            .setSubscriptionSessionId(subscriptionSessionId)
+            .setSubscriptionId(data['subscription_id'])
+            .setSubscriptionSessionId(data['subscription_session_id'])
             .build();
-        return subsriptionSession;
       } else {
-        print(
-            "$TAG -------- Failed to create subscription: ${response.statusCode} ${response.body}");
+        print("$TAG -------- Failed to create subscription: ${response.statusCode} ${response.body}");
       }
     } catch (e) {
       print("$TAG -------- Exception during subscription creation: $e");
     }
-
     return null;
   }
 
@@ -486,33 +699,29 @@ class _MyAppState extends State<MyApp> {
         "customer_phone": "9876543210"
       },
       "order_meta": {
-        "return_url": "https://www.cashfree.com/devstudio/preview/pg/seamless?order_id={order_id}"
+        "return_url": "https://www.cashfree.com/devstudio/preview/pg/web/checkout?order_id={order_id}"
       },
     });
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        final paymentSessionId = data['payment_session_id'];
-        final orderId = data['order_id'];
-        var cfSession = CFSessionBuilder()
+        return CFSessionBuilder()
             .setEnvironment(environment)
-            .setOrderId(orderId)
-            .setPaymentSessionId(paymentSessionId)
+            .setOrderId(data['order_id'])
+            .setPaymentSessionId(data['payment_session_id'])
             .build();
-        return cfSession;
       } else {
-        print(
-            "$TAG -------- Failed to create order: ${response.statusCode} ${response.body}");
+        print("$TAG -------- Failed to create order: ${response.statusCode} ${response.body}");
       }
     } catch (e) {
       print("$TAG -------- Exception during order creation: $e");
     }
-
     return null;
   }
+
+  // ─── Callbacks ────────────────────────────────────────────────────────────────
 
   void onSubscriptionVerify(String subscriptionId) {
     print("$TAG -------- Verify Subscription ===> $subscriptionId");
