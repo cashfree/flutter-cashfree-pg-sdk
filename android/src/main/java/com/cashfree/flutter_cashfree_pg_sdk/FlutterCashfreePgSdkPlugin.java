@@ -22,6 +22,12 @@ import com.cashfree.pg.core.api.exception.CFException;
 import com.cashfree.pg.core.api.netbanking.CFNetBanking;
 import com.cashfree.pg.core.api.netbanking.CFNetBankingPayment;
 import com.cashfree.pg.core.api.subscription.CFSubscriptionPayment;
+import com.cashfree.pg.core.api.subscription.card.CFSubsCard;
+import com.cashfree.pg.core.api.subscription.card.CFSubsCardPayment;
+import com.cashfree.pg.core.api.subscription.enach.CFSubsNetBanking;
+import com.cashfree.pg.core.api.subscription.enach.CFSubsNetBankingPayment;
+import com.cashfree.pg.core.api.subscription.upi.CFSubsUpi;
+import com.cashfree.pg.core.api.subscription.upi.CFSubsUpiPayment;
 import com.cashfree.pg.core.api.upi.CFUPI;
 import com.cashfree.pg.core.api.upi.CFUPIPayment;
 import com.cashfree.pg.core.api.utils.CFErrorResponse;
@@ -93,7 +99,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
   private Activity activity;
   private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
-  private final String CF_FL_SDK_VERSION = "2.2.10";
+  private final String CF_FL_SDK_VERSION = "2.3.2";
 
   void FlutterCashfreePgSdkPlugin() {}
 
@@ -283,6 +289,63 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
       } catch (CFException e) {
         handleExceptions(e.getMessage());
       }
+    } else if (call.method.equals("doSubsUPIPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> upi = (Map<String, String>) request.get("upi");
+      try {
+        CFSubscriptionSession cfSession = createSubscriptionSession(session);
+        CFSubsUpi cfSubsUPI = createSubsUPIObject(upi);
+        CFSubsUpiPayment cfSubsUPIPayment = new CFSubsUpiPayment.CFSubsUpiPaymentBuilder()
+                .setSubscriptionSession(cfSession)
+                .setSubsUpi(cfSubsUPI)
+                .build();
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
+        cfSubsUPIPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfSubsUPIPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.SUBSCRIPTION);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doSubscriptionPayment(this.activity, cfSubsUPIPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if (call.method.equals("doSubsNetbankingPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> netbanking = (Map<String, String>) request.get("net_banking");
+      try {
+        CFSubscriptionSession cfSession = createSubscriptionSession(session);
+        CFSubsNetBanking cfSubsNetBanking = createSubsNetbankingObject(netbanking);
+        CFSubsNetBankingPayment cfSubsNetBankingPayment = new CFSubsNetBankingPayment.CFNetBankingPaymentBuilder()
+                .setSubscriptionSession(cfSession)
+                .setCfSubsNetBanking(cfSubsNetBanking)
+                .build();
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
+        cfSubsNetBankingPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfSubsNetBankingPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.SUBSCRIPTION);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doSubscriptionPayment(this.activity, cfSubsNetBankingPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
+    } else if (call.method.equals("doSubsCardPayment")) {
+      Map<String, Object> request = (Map<String, Object>) call.arguments;
+      Map<String, String> session = (Map<String, String>) request.get("session");
+      Map<String, String> card = (Map<String, String>) request.get("card");
+      try {
+        CFSubscriptionSession cfSession = createSubscriptionSession(session);
+        CFSubsCard cfSubsCard = createSubsCardObject(card);
+        CFSubsCardPayment cfSubsCardPayment = new CFSubsCardPayment.CFSubsCardPaymentBuilder()
+                .setSubscriptionSession(cfSession)
+                .setSubsCard(cfSubsCard)
+                .build();
+        CFPayment.CFSDKFramework.FLUTTER.withVersion(CF_FL_SDK_VERSION);
+        cfSubsCardPayment.setCfsdkFramework(CFPayment.CFSDKFramework.FLUTTER);
+        cfSubsCardPayment.setCfSDKFlavour(CFPayment.CFSDKFlavour.SUBSCRIPTION);
+        CFPaymentGatewayService gatewayService = CFPaymentGatewayService.getInstance();
+        gatewayService.doSubscriptionPayment(this.activity, cfSubsCardPayment);
+      } catch (CFException e) {
+        handleExceptions(e.getMessage());
+      }
     } else if (call.method.equals("response")) {
         try {
           if(finalResponse != null) {
@@ -410,6 +473,45 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
                 .build();
       }
       return cfCard;
+    } catch (CFException e) {
+      throw e;
+    }
+  }
+
+  private CFSubsUpi createSubsUPIObject(Map<String, String> upi) throws CFException {
+    try {
+      return new CFSubsUpi.CFSubsUpiBuilder()
+              .setMode(CFSubsUpi.Mode.INTENT)
+              .setUPIID(upi.get("upi_id"))
+              .build();
+    } catch (CFException e) {
+      throw e;
+    }
+  }
+
+  private CFSubsNetBanking createSubsNetbankingObject(Map<String, String> netbanking) throws CFException {
+    try {
+      return new CFSubsNetBanking.CFSubsNetBankingBuilder()
+              .setAuthMode(netbanking.get("auth_mode"))
+              .setAccountHolderName(netbanking.get("account_holder_name"))
+              .setAccountNumber(netbanking.get("account_number"))
+              .setAccountType(netbanking.get("account_type"))
+              .setAccountBankCode(netbanking.get("account_bank_code"))
+              .build();
+    } catch (CFException e) {
+      throw e;
+    }
+  }
+
+  private CFSubsCard createSubsCardObject(Map<String, String> card) throws CFException {
+    try {
+      return new CFSubsCard.CFSubsCardBuilder()
+              .setCardNumber(card.get("card_number"))
+              .setCardHolderName(card.get("card_holder_name"))
+              .setCardExpiryMonth(card.get("card_expiry_mm"))
+              .setCardExpiryYear(card.get("card_expiry_yy"))
+              .setCVV(card.get("card_cvv"))
+              .build();
     } catch (CFException e) {
       throw e;
     }
