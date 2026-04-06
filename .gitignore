@@ -11,3 +11,4 @@ pubspec.lock
 .flutter-plugins
 local.properties
 .claude/
+.history/
