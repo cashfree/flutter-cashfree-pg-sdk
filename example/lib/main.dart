@@ -31,7 +31,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'webpage_demo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -693,7 +692,7 @@ class _MyAppState extends State<MyApp> {
     final body = jsonEncode({
       "order_amount": 1.00,
       "order_currency": "INR",
-      "order_id": "devstudio_7445082824618121191",
+      "order_id": "devstudio_${DateTime.now().millisecondsSinceEpoch}",
       "customer_details": {
         "customer_id": "devstudio_user",
         "customer_phone": "9876543210"

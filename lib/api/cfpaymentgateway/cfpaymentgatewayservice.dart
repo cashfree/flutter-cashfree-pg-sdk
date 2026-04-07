@@ -20,6 +20,13 @@ import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 import '../cfcard/cfcardwidget.dart';
 import '../cfpayment/cfpayment.dart';
 
+/// Singleton service that handles all Cashfree payment gateway operations.
+///
+/// Use this as the entry point for initiating payments:
+/// ```dart
+/// CFPaymentGatewayService().setCallback(onVerify, onError);
+/// CFPaymentGatewayService().doPayment(cfPayment);
+/// ```
 class CFPaymentGatewayService {
   static final CFPaymentGatewayService _singleton = CFPaymentGatewayService._internal();
 
@@ -29,9 +36,16 @@ class CFPaymentGatewayService {
 
   CFPaymentGatewayService._internal();
 
+  /// Callback invoked on successful payment. Receives the order ID for server-side verification.
   static void Function(String)? verifyPayment;
+
+  /// Callback invoked on payment failure or error. Receives a [CFErrorResponse] and the order ID.
   static void Function(CFErrorResponse, String)? onError;
 
+  /// Registers the success and error callbacks, then polls for any pending native response.
+  ///
+  /// Must be called before [doPayment]. The [vp] callback is triggered on success with
+  /// the order ID; [error] is triggered on failure with a [CFErrorResponse] and order ID.
   setCallback(final void Function(String) vp, final void Function(CFErrorResponse, String) error) {
     verifyPayment = vp;
     onError = error;
@@ -65,6 +79,11 @@ class CFPaymentGatewayService {
 
   // TODO: take id for flutter web
 
+  /// Initiates a payment using the provided [cfPayment] object.
+  ///
+  /// The payment type is determined by the runtime type of [cfPayment]
+  /// (e.g., [CFWebCheckoutPayment], [CFUPIPayment], [CFSubsCardPayment], etc.).
+  /// Throws a [CFException] if [setCallback] has not been called first.
   doPayment(CFPayment cfPayment) {
     if(verifyPayment == null || onError == null) {
       throw CFException(CFExceptionConstants.CALLBACK_NOT_SET);
@@ -144,6 +163,9 @@ class CFPaymentGatewayService {
     }
   }
 
+  /// Handles the native channel response for standard payment flows.
+  ///
+  /// Parses the JSON [value] and routes to [verifyPayment] on success or [onError] on failure.
   void responseMethod(dynamic value) {
     if(value != null) {
       final body = json.decode(value);
@@ -168,6 +190,10 @@ class CFPaymentGatewayService {
     }
   }
 
+  /// Handles the native channel response for subscription element payment flows.
+  ///
+  /// Parses the JSON [value] and routes to [verifyPayment] on success or [onError] on failure.
+  /// On success, uses `subscriptionId` from the response payload.
   void responseSubscriptionMethod(dynamic value) {
     if(value != null) {
       final body = json.decode(value);
