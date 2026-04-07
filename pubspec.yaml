@@ -6,7 +6,7 @@ repository: https://github.com/cashfree/flutter-cashfree-pg-sdk
 documentation: https://docs.cashfree.com/docs/flutter-integration
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=2.5.0"
 
 dependencies:
@@ -15,8 +15,8 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
+  js: ^0.6.4
   http: ^1.1.0
-  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
