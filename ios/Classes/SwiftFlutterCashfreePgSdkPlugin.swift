@@ -39,7 +39,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
-    private let versionNumber = "2.3.2"
+    private let versionNumber = "2.3.3"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())
@@ -65,7 +65,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 netbankingPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(netbankingPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -86,7 +86,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 upiPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(upiPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -106,7 +106,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                         .build()
                     let systemVersion = UIDevice.current.systemVersion
                     dropCheckoutPayment.setPlatform("iflt-i-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                    if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                    if let vc = self.getRootViewController() {
                         try self.cfPaymentGatewayService.doPayment(dropCheckoutPayment, viewController: vc)
                     } else {
                         self.sendException(message: "unable to get an instance of rootViewController")
@@ -147,7 +147,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 cardPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(cardPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -180,7 +180,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                 }
                 let systemVersion = UIDevice.current.systemVersion
                 dropCheckoutPayment.setPlatform("iflt-d-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(dropCheckoutPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -198,7 +198,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                 .build()
                 let systemVersion = UIDevice.current.systemVersion
                 webCheckoutPayment.setPlatform("iflt-c-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                 if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -216,7 +216,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 subscriptionWebCheckoutPayment.setPlatform("iflt-sbc-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.startSubscription(subscriptionWebCheckoutPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -237,7 +237,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 upiSubsPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doSubsPayment(upiSubsPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -258,7 +258,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 netbankingSubsPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doSubsPayment(netbankingSubsPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -279,7 +279,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 cardSubsPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
-                if let vc = UIApplication.shared.delegate?.window??.rootViewController {
+                if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doSubsPayment(cardSubsPayment, viewController: vc)
                 } else {
                     self.sendException(message: "unable to get an instance of rootViewController")
@@ -291,6 +291,24 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
         }
     }
     
+    private func getRootViewController() -> UIViewController? {
+          guard #available(iOS 13.0, *) else {
+              return UIApplication.shared.delegate?.window??.rootViewController
+          }
+
+          return UIApplication.shared.connectedScenes
+              .filter { $0.activationState == .foregroundActive }
+              .compactMap { $0 as? UIWindowScene }
+              .compactMap { scene -> UIWindow? in
+                  if #available(iOS 15.0, *) {
+                      // Try keyWindow first, fallback to first window in the scene
+                      return scene.keyWindow ?? scene.windows.first
+                  }
+                  return scene.windows.first(where: { $0.isKeyWindow }) ?? scene.windows.first
+              }
+              .first?.rootViewController
+      }
+
     private func createSession(session: Dictionary<String, String>) throws -> CFSession {
         do {
             var environment = CFENVIRONMENT.SANDBOX

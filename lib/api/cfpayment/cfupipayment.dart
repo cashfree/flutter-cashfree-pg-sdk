@@ -4,6 +4,15 @@ import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptionconstants.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 
+/// Builder for creating a [CFUPIPayment] object.
+///
+/// Example:
+/// ```dart
+/// final payment = CFUPIPaymentBuilder()
+///   .setSession(session)
+///   .setUPI(upi)
+///   .build();
+/// ```
 class CFUPIPaymentBuilder {
 
   CFSession? _session;
@@ -11,16 +20,21 @@ class CFUPIPaymentBuilder {
 
   CFUPIPaymentBuilder();
 
+  /// Sets the [CFSession] for this payment.
   CFUPIPaymentBuilder setSession(CFSession session) {
     _session = session;
     return this;
   }
 
+  /// Sets the [CFUPI] payment method details.
   CFUPIPaymentBuilder setUPI(CFUPI cfupi) {
     _cfupi = cfupi;
     return this;
   }
 
+  /// Validates required fields and returns a [CFUPIPayment].
+  ///
+  /// Throws a [CFException] if session is not set.
   CFUPIPayment build() {
     if(_session == null) {
       throw CFException(CFExceptionConstants.SESSION_NOT_PRESENT);
@@ -38,6 +52,9 @@ class CFUPIPaymentBuilder {
 
 }
 
+/// Represents a complete UPI payment object ready for submission.
+///
+/// Create instances using [CFUPIPaymentBuilder].
 class CFUPIPayment extends CFPayment {
 
   late CFSession _session;
@@ -51,10 +68,12 @@ class CFUPIPayment extends CFPayment {
     _cfupi = builder.getUPI();
   }
 
+  /// Returns the [CFSession] associated with this payment.
   CFSession getSession() {
     return _session;
   }
 
+  /// Returns the [CFUPI] payment method details.
   CFUPI getUPI() {
     return _cfupi!;
   }

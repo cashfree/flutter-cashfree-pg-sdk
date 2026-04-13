@@ -1,3 +1,8 @@
+## 2.3.3+50
+
+* Flutter 3.38.0 support
+* FlutterImplicitEngineDelegate support
+
 ## 2.3.2+49
 
 * Upgrade android sdk version 2.3.2

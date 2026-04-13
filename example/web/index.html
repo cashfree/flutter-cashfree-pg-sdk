@@ -32,14 +32,20 @@
   <title>flutter_cashfree_pg_sdk_example</title>
   <link rel="manifest" href="manifest.json">
 
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
 </head>
 <body>
   <script>
     window.addEventListener('load', function(ev) {
-      _flutter.loader.load({
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
         serviceWorker: {
-          serviceWorkerVersion: "{{flutter_service_worker_version}}",
+          serviceWorkerVersion: serviceWorkerVersion,
         }
       }).then(function(engineInitializer) {
         return engineInitializer.initializeEngine();

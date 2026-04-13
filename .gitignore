@@ -12,3 +12,7 @@ pubspec.lock
 local.properties
 .claude/
 .history/
+
+# FVM Version Cache
+.fvm/
+.fvmrc
