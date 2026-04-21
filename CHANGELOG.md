@@ -1,3 +1,9 @@
+## 2.3.4+51
+
+* ios NB Back button enable
+* FlutterImplicitEngineDelegate support
+
+
 ## 2.3.3+50
 
 * Flutter 3.38.0 support

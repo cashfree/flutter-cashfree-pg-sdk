@@ -99,7 +99,7 @@ public class FlutterCashfreePgSdkPlugin implements FlutterPlugin, MethodCallHand
 
   private Activity activity;
   private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
-  private final String CF_FL_SDK_VERSION = "2.3.3";
+  private final String CF_FL_SDK_VERSION = "2.3.4";
 
   void FlutterCashfreePgSdkPlugin() {}
 
