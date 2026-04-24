@@ -39,7 +39,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
-    private let versionNumber = "2.3.3"
+    private let versionNumber = "2.3.4"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())
@@ -65,6 +65,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 netbankingPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                netbankingPayment.setCancelButtonVisibility(true)
                 if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(netbankingPayment, viewController: vc)
                 } else {
