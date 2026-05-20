@@ -13,6 +13,7 @@ local.properties
 .claude/
 .history/
 
-# FVM Version Cache
-.fvm/
-.fvmrc
+
+# Added by code-review-graph
+.code-review-graph/
+.mcp.json

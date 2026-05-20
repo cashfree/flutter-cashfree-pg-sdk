@@ -39,7 +39,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     
     private var flutterResult: FlutterResult?
     private var cfPaymentGatewayService: CFPaymentGatewayService!
-    private let versionNumber = "2.3.4"
+    private let versionNumber = "2.4.0"
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_cashfree_pg_sdk", binaryMessenger: registrar.messenger())
@@ -148,6 +148,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                     .build()
                 let systemVersion = UIDevice.current.systemVersion
                 cardPayment.setPlatform("iflt-e-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                cardPayment.setCancelButtonVisibility(true)
                 if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(cardPayment, viewController: vc)
                 } else {
@@ -199,6 +200,7 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
                                 .build()
                 let systemVersion = UIDevice.current.systemVersion
                 webCheckoutPayment.setPlatform("iflt-c-\(versionNumber)-3.13.3-m-s-x-i-\(systemVersion.prefix(4))")
+                webCheckoutPayment.setCancelButtonVisibility(true)
                  if let vc = self.getRootViewController() {
                     try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: vc)
                 } else {
@@ -293,22 +295,28 @@ public class SwiftFlutterCashfreePgSdkPlugin: NSObject, FlutterPlugin, CFRespons
     }
     
     private func getRootViewController() -> UIViewController? {
-          guard #available(iOS 13.0, *) else {
-              return UIApplication.shared.delegate?.window??.rootViewController
-          }
+        guard #available(iOS 13.0, *) else {
+            return UIApplication.shared.delegate?.window??.rootViewController
+        }
 
-          return UIApplication.shared.connectedScenes
-              .filter { $0.activationState == .foregroundActive }
-              .compactMap { $0 as? UIWindowScene }
-              .compactMap { scene -> UIWindow? in
-                  if #available(iOS 15.0, *) {
-                      // Try keyWindow first, fallback to first window in the scene
-                      return scene.keyWindow ?? scene.windows.first
-                  }
-                  return scene.windows.first(where: { $0.isKeyWindow }) ?? scene.windows.first
-              }
-              .first?.rootViewController
-      }
+        // Try foregroundActive first, then foregroundInactive as fallback
+        for state in [UIScene.ActivationState.foregroundActive, .foregroundInactive] {
+            if let vc = UIApplication.shared.connectedScenes
+                .filter({ $0.activationState == state })
+                .compactMap({ $0 as? UIWindowScene })
+                .compactMap({ scene -> UIWindow? in
+                    if #available(iOS 15.0, *) {
+                        return scene.keyWindow ?? scene.windows.first
+                    }
+                    return scene.windows.first(where: { $0.isKeyWindow }) ?? scene.windows.first
+                })
+                .first?.rootViewController {
+                return vc
+            }
+        }
+        // Fallback for old-style AppDelegate without UIApplicationSceneManifest
+        return UIApplication.shared.delegate?.window??.rootViewController
+    }
 
     private func createSession(session: Dictionary<String, String>) throws -> CFSession {
         do {
