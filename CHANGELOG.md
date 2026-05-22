@@ -1,3 +1,10 @@
+## 2.4.0+52
+
+* Upgrade ios sdk version v2.4.0 
+* Upgrade android sdk version v2.4.0
+* Android 16 migration
+* FlutterImplicitEngineDelegate support
+
 ## 2.3.4+51
 
 * ios NB Back button enable

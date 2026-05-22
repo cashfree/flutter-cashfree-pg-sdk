@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.3.2+49). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
+This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.4.0+52). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
 
 ## Common Commands
 
@@ -120,8 +120,8 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 **iOS vs Android difference:** On iOS, `upi_id` is a URI scheme (e.g. `phonepe://`, `tez://`). On Android it is the PSP app package name (e.g. `com.phonepe.app`). The example app detects platform and sets the appropriate default/hint.
 
 ### Native SDK Versions
-- Android: `com.cashfree.pg:api:2.3.2` (compileSdk 35, minSdk 19)
-- iOS: `CashfreePG 2.3.2` (iOS 12.0+, Swift 5.0)
+- Android: `com.cashfree.pg:api:2.4.0` (compileSdk 36, minSdk 19, targets Android 16)
+- iOS: `CashfreePG 2.4.0` (iOS 12.0+, Swift 5.0)
 
 ### Card Widget (special case)
 `CFCardPayment` does not use a method channel. Instead, `CFCardWidget` is a Flutter widget rendered inline; card payment is completed directly from the widget's state via `CFCardWidgetState.completePayment()`. Card icon assets (Visa, Mastercard, etc.) are bundled in `assets/`.
@@ -144,7 +144,47 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 When bumping the SDK version, update:
 1. `pubspec.yaml` — `version`
 2. `ios/flutter_cashfree_pg_sdk.podspec` — `s.version` and `s.dependency "CashfreePG"`
-3. `android/build.gradle` — Cashfree dependency version
+3. `android/build.gradle` — Cashfree dependency version (`com.cashfree.pg:api:X.Y.Z`)
 4. `ios/Classes/SwiftFlutterCashfreePgSdkPlugin.swift` — `versionNumber` constant
-5. `CHANGELOG.md`
-6. `CLAUDE.md` — version in Overview and Native SDK Versions
+5. `android/src/main/java/com/cashfree/flutter_cashfree_pg_sdk/FlutterCashfreePgSdkPlugin.java` — `CF_FL_SDK_VERSION` constant
+6. `CHANGELOG.md`
+7. `CLAUDE.md` — version in Overview and Native SDK Versions
+
+<!-- code-review-graph MCP tools -->
+## MCP Tools: code-review-graph
+
+**IMPORTANT: This project has a knowledge graph. ALWAYS use the
+code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
+the codebase.** The graph is faster, cheaper (fewer tokens), and gives
+you structural context (callers, dependents, test coverage) that file
+scanning cannot.
+
+### When to use graph tools FIRST
+
+- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
+- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
+- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
+- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview` + `list_communities`
+
+Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+
+### Key Tools
+
+| Tool | Use when |
+| ------ | ---------- |
+| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
+| `get_review_context` | Need source snippets for review — token-efficient |
+| `get_impact_radius` | Understanding blast radius of a change |
+| `get_affected_flows` | Finding which execution paths are impacted |
+| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes` | Finding functions/classes by name or keyword |
+| `get_architecture_overview` | Understanding high-level codebase structure |
+| `refactor_tool` | Planning renames, finding dead code |
+
+### Workflow
+
+1. The graph auto-updates on file changes (via hooks).
+2. Use `detect_changes` for code review.
+3. Use `get_affected_flows` to understand impact.
+4. Use `query_graph` pattern="tests_for" to check coverage.
