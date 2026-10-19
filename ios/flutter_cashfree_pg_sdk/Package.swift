@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "flutter_cashfree_pg_sdk",
     platforms: [
-        .iOS("12.0")
+        .iOS("13.0")
     ],
     products: [
         .library(name: "flutter-cashfree-pg-sdk", targets: ["flutter_cashfree_pg_sdk"])

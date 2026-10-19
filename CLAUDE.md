@@ -122,7 +122,7 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 
 ### Native SDK Versions
 - Android: `com.cashfree.pg:api:2.6.1` (compileSdk 36, minSdk 19, targets Android 16)
-- iOS: `CashfreePG 2.5.3` via CocoaPods / `cashfree/core-ios-sdk` tag `2.5.3` via SPM (iOS 12.0+, Swift 5.0)
+- iOS: `CashfreePG 2.5.3` via CocoaPods / `cashfree/core-ios-sdk` tag `2.5.3` via SPM (iOS 13.0+ — the native frameworks are built with minos 13.0, Swift 5.0)
 
 ### iOS Distribution — SPM + CocoaPods
 The iOS plugin ships both a podspec (`ios/`, sources in `ios/Classes`) and a `Package.swift` (`ios/flutter_cashfree_pg_sdk/`). `Sources/flutter_cashfree_pg_sdk/SwiftFlutterCashfreePgSdkPlugin.swift` is a **symlink** into `ios/Classes` — edit the file in `ios/Classes`; pub resolves the symlink to a real file on publish. Flutter 3.44+ uses SPM by default.
