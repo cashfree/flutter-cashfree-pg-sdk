@@ -1,3 +1,8 @@
+## 2.5.0+53
+
+* Upgrade android sdk version v2.6.1
+* Upgrade ios sdk version v2.5.3
+
 ## 2.4.0+52
 
 * Upgrade ios sdk version v2.4.0 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.4.0+52). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
+This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.5.0+53). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
 
 ## Common Commands
 
@@ -120,8 +120,8 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 **iOS vs Android difference:** On iOS, `upi_id` is a URI scheme (e.g. `phonepe://`, `tez://`). On Android it is the PSP app package name (e.g. `com.phonepe.app`). The example app detects platform and sets the appropriate default/hint.
 
 ### Native SDK Versions
-- Android: `com.cashfree.pg:api:2.4.0` (compileSdk 36, minSdk 19, targets Android 16)
-- iOS: `CashfreePG 2.4.0` (iOS 12.0+, Swift 5.0)
+- Android: `com.cashfree.pg:api:2.6.1` (compileSdk 36, minSdk 19, targets Android 16)
+- iOS: `CashfreePG 2.5.3` (iOS 12.0+, Swift 5.0)
 
 ### Card Widget (special case)
 `CFCardPayment` does not use a method channel. Instead, `CFCardWidget` is a Flutter widget rendered inline; card payment is completed directly from the widget's state via `CFCardWidgetState.completePayment()`. Card icon assets (Visa, Mastercard, etc.) are bundled in `assets/`.
