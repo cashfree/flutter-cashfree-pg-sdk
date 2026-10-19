@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_cashfree_pg_sdk'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.version          = '2.6.0'
+  s.summary          = 'Cashfree Payment Gateway Flutter plugin.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+Flutter plugin wrapping the Cashfree Payment Gateway iOS SDK.
                        DESC
   s.homepage         = 'http://cashfree.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Cashfree Payments' => 'develoeprs@cashfree.com' }
+  s.author           = { 'Cashfree Payments' => 'developers@cashfree.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
