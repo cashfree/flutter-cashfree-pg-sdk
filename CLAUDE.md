@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.5.0+53). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
+This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.6.0+54). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
 
 ## Common Commands
 
@@ -27,8 +27,9 @@ cd example && flutter run
 # Example app dependencies
 cd example && flutter pub get
 
-# iOS: install pods (from example/ios/)
-cd example/ios && pod install
+# iOS: build for simulator (SPM by default on Flutter 3.44+; Flutter runs `pod install` itself
+# for any plugins still on CocoaPods)
+cd example && flutter build ios --simulator --debug
 
 # Android: build (from android/)
 cd android && ./gradlew build
@@ -40,7 +41,7 @@ cd android && ./gradlew build
 This is a Flutter federated plugin targeting Android, iOS, and Web:
 - **Dart layer** (`lib/`): public API and method channel communication
 - **Android layer** (`android/`): Java plugin (`FlutterCashfreePgSdkPlugin.java`)
-- **iOS layer** (`ios/Classes/`): Swift plugin (`SwiftFlutterCashfreePgSdkPlugin.swift`)
+- **iOS layer** (`ios/Classes/`): Swift plugin (`SwiftFlutterCashfreePgSdkPlugin.swift`) + Objective-C shim, distributed via both CocoaPods and Swift Package Manager
 - **Example app** (`example/`): full integration demo
 
 ### Method Channel
@@ -121,7 +122,16 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 
 ### Native SDK Versions
 - Android: `com.cashfree.pg:api:2.6.1` (compileSdk 36, minSdk 19, targets Android 16)
-- iOS: `CashfreePG 2.5.3` (iOS 12.0+, Swift 5.0)
+- iOS: `CashfreePG 2.5.3` via CocoaPods / `cashfree/core-ios-sdk` tag `2.5.3` via SPM (iOS 13.0+ — the native frameworks are built with minos 13.0, Swift 5.0)
+
+### iOS Distribution — SPM + CocoaPods
+The iOS plugin ships both a podspec (`ios/`, sources in `ios/Classes`) and a `Package.swift` (`ios/flutter_cashfree_pg_sdk/`). `Sources/flutter_cashfree_pg_sdk/SwiftFlutterCashfreePgSdkPlugin.swift` is a **symlink** into `ios/Classes` — edit the file in `ios/Classes`; pub resolves the symlink to a real file on publish. Flutter 3.44+ uses SPM by default.
+- The SPM dependency is `https://github.com/cashfree/core-ios-sdk` (package identity `core-ios-sdk`). Its five binary targets declare no inter-dependencies, so `Package.swift` must list **all five** products (`CashfreePG`, `CashfreePGUISDK`, `CashfreePGCoreSDK`, `CashfreeAnalyticsSDK`, `CFNetworkSDK`) or the app crashes at launch with `Library not loaded`.
+- The iOS `pluginClass` is `FlutterCashfreePgSdkPlugin`. Under CocoaPods it is the Objective-C shim in `ios/Classes`. SPM targets cannot mix Objective-C and Swift, so the SPM package instead has its own `FlutterCashfreePgSdkPlugin.swift` (not symlinked): a Swift subclass declared `@objc(FlutterCashfreePgSdkPlugin)`. Never add that subclass to `ios/Classes` — it would clash with the shim under CocoaPods.
+- Adding a new Swift file to `ios/Classes/`? Also add a matching symlink in `ios/flutter_cashfree_pg_sdk/Sources/flutter_cashfree_pg_sdk/` (`ln -s ../../../Classes/<File>.swift`), or CocoaPods builds but SPM fails with missing symbols.
+- Gotcha: building the example app with SPM fails with an identity mismatch (`flutter-cashfree-pg-sdk` vs `flutter_cashfree_pg_sdk`) if the repo is checked out in a folder not named `flutter_cashfree_pg_sdk`. Merchant apps are unaffected. Clone into the canonical name: `git clone git@github.com:cashfree/flutter-cashfree-pg-sdk.git flutter_cashfree_pg_sdk`. Also, Flutter caches package clones under `example/build/ios/SourcePackages` with `-skipPackageUpdates`; delete it if a newly published native tag "doesn't match".
+- The example app cannot build iOS with SPM against a `git:` dependency on this plugin (e.g. `ref: <branch>`): Flutter adds an example-only override pointing at `../`, which clashes with the git copy's identity. Use `path: ../` for iOS in the example. A standalone merchant app with a `git:` dependency works fine.
+- Testing the example via CocoaPods: set `enable-swift-package-manager: false` in `example/pubspec.yaml` **and** restore the pre-SPM Xcode project (`git checkout main -- example/ios/Runner.xcodeproj/project.pbxproj example/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme example/ios/Podfile.lock`), then `flutter clean`. The flag alone fails because the migrated project still references the SPM packages. Do not commit that state.
 
 ### Card Widget (special case)
 `CFCardPayment` does not use a method channel. Instead, `CFCardWidget` is a Flutter widget rendered inline; card payment is completed directly from the widget's state via `CFCardWidgetState.completePayment()`. Card icon assets (Visa, Mastercard, etc.) are bundled in `assets/`.
@@ -144,6 +154,7 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 When bumping the SDK version, update:
 1. `pubspec.yaml` — `version`
 2. `ios/flutter_cashfree_pg_sdk.podspec` — `s.version` and `s.dependency "CashfreePG"`
+2a. `ios/flutter_cashfree_pg_sdk/Package.swift` — `core-ios-sdk` `exact:` version (must match the podspec's CashfreePG version)
 3. `android/build.gradle` — Cashfree dependency version (`com.cashfree.pg:api:X.Y.Z`)
 4. `ios/Classes/SwiftFlutterCashfreePgSdkPlugin.swift` — `versionNumber` constant
 5. `android/src/main/java/com/cashfree/flutter_cashfree_pg_sdk/FlutterCashfreePgSdkPlugin.java` — `CF_FL_SDK_VERSION` constant

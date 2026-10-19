@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "core-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cashfree/core-ios-sdk",
+      "state" : {
+        "revision" : "173208a2154ad733841346ff8b94cd63cac13905",
+        "version" : "2.5.3"
+      }
+    }
+  ],
+  "version" : 2
+}
