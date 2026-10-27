@@ -27,6 +27,15 @@ Please replace the values for orderId, token (Payment Session ID) and environmen
 ```
 
 
+### iOS: Swift Package Manager and CocoaPods
+
+The plugin supports both of Flutter's iOS dependency managers, with no extra setup for either:
+
+- **Swift Package Manager** (Flutter's default from 3.44): `ios/flutter_cashfree_pg_sdk/Package.swift` is picked up automatically and pulls the native SDK from [cashfree/core-ios-sdk](https://github.com/cashfree/core-ios-sdk).
+- **CocoaPods**: the podspec is still shipped and pulls `CashfreePG` as before.
+
+Both resolve the same native SDK version. Minimum iOS version is 13.0 (required by the native Cashfree iOS SDK).
+
 | Please refer our official flutter documentation [here](https://docs.cashfree.com/docs/flutter-integration).
 
 
