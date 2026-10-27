@@ -1,0 +1,21 @@
+# A .pubignore replaces .gitignore for publishing, so the root .gitignore rules are repeated here.
+.DS_Store
+.atom/
+.idea
+.packages
+.dart_tool/
+.pub/
+build/
+ios/.generated/
+packages
+pubspec.lock
+.flutter-plugins
+local.properties
+.claude/
+.history/
+.code-review-graph/
+.mcp.json
+
+# Internal / IDE files that should not ship to pub.dev
+CLAUDE.md
+*.iml
