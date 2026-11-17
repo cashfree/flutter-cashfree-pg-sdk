@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfcard/cfcardlistener.dart';
@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    subsUPIIdController.text = Platform.isAndroid ? "com.phonepe.app" : "phonepe://";
+    subsUPIIdController.text = defaultTargetPlatform == TargetPlatform.android ? "com.phonepe.app" : "phonepe://";
     cfPaymentGatewayService.setCallback(verifyPayment, onError);
     final GlobalKey<CFCardWidgetState> myWidgetKey =
         GlobalKey<CFCardWidgetState>();
@@ -194,7 +194,7 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   _buildCompactTextField(
                     subsUPIIdController,
-                    Platform.isAndroid ? 'PSP Package (e.g. com.phonepe.app)' : 'URI Schema (e.g. phonepe://)',
+                    defaultTargetPlatform == TargetPlatform.android ? 'PSP Package (e.g. com.phonepe.app)' : 'URI Schema (e.g. phonepe://)',
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
