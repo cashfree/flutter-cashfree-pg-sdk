@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_cashfree_pg_sdk'
-  s.version          = '2.6.0'
+  s.version          = '2.7.0'
   s.summary          = 'Cashfree Payment Gateway Flutter plugin.'
   s.description      = <<-DESC
 Flutter plugin wrapping the Cashfree Payment Gateway iOS SDK.
