@@ -1,3 +1,8 @@
+## 2.7.0+55
+
+* Upgrade android sdk version v2.7.1
+* iOS sdk version unchanged (v2.5.3)
+
 ## 2.6.0+54
 
 * Swift Package Manager support for iOS. The plugin now ships `ios/flutter_cashfree_pg_sdk/Package.swift` alongside the podspec, so apps build with either of Flutter's iOS dependency managers. CocoaPods integration is unchanged.

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.6.0+54). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
+This is the **Cashfree Payment Gateway Flutter plugin SDK** (`flutter_cashfree_pg_sdk`, v2.7.0+55). It wraps native Android (Java) and iOS (Swift) Cashfree SDKs via Flutter method channels, exposing payment APIs to Flutter apps.
 
 ## Common Commands
 
@@ -121,7 +121,7 @@ All subscription element payments call `cfPaymentGatewayService.doSubsPayment(_:
 **iOS vs Android difference:** On iOS, `upi_id` is a URI scheme (e.g. `phonepe://`, `tez://`). On Android it is the PSP app package name (e.g. `com.phonepe.app`). The example app detects platform and sets the appropriate default/hint.
 
 ### Native SDK Versions
-- Android: `com.cashfree.pg:api:2.6.1` (compileSdk 36, minSdk 19, targets Android 16)
+- Android: `com.cashfree.pg:api:2.7.1` (compileSdk 36, minSdk 19, targets Android 16)
 - iOS: `CashfreePG 2.5.3` via CocoaPods / `cashfree/core-ios-sdk` tag `2.5.3` via SPM (iOS 13.0+ — the native frameworks are built with minos 13.0, Swift 5.0)
 
 ### iOS Distribution — SPM + CocoaPods
