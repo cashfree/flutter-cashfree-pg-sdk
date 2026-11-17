@@ -51,6 +51,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:web/web.dart' as web;
 
 import 'api/cferrorresponse/cferrorresponse.dart';
+import 'src/cf_sdk_version.dart';
 
 /// `window.CFFlutter.Cashfree` from the Cashfree JS SDK.
 @JS('Cashfree')
@@ -75,7 +76,10 @@ class FlutterCashfreePgSdkWeb {
   /// Constructs a FlutterCashfreePgSdkWeb
   FlutterCashfreePgSdkWeb();
 
-  static const String _pluginName = "jflt-d-2.0.10-3.3.10";
+  // Analytics tag read by Cashfree: j(s)flt-d(rop)-<plugin version>-3.3.10.
+  // Only the version segment is dynamic; the rest is kept as-is because the
+  // backend's parsing of it is not documented here.
+  static const String _pluginName = "jflt-d-$cfSdkVersion-3.3.10";
   static const String _outerDivId = "cf-outer-div";
   static const String _placeholderId = "cf-flutter-placeholder";
   static const String _closeButtonId = "cf-close-button";

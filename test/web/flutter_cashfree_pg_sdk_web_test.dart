@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_cashfree_pg_sdk/flutter_cashfree_pg_sdk_web.dart';
+import 'package:flutter_cashfree_pg_sdk/src/cf_sdk_version.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web/web.dart' as web;
 
@@ -117,7 +118,9 @@ void main() {
     // always rendered Cashfree's default theme. Do not send a style until
     // honouring CFTheme on web is a deliberate, separately-tested change.
     expect(cfg.getProperty<JSAny?>('style'.toJS), isNull);
-    expect(cfg.getProperty<JSString>('pluginName'.toJS).toDart, isNotEmpty);
+    // Same shape as before (jflt-d-<version>-3.3.10); only the plugin
+    // version is now real instead of the stale 2.0.10.
+    expect(cfg.getProperty<JSString>('pluginName'.toJS).toDart, 'jflt-d-$cfSdkVersion-3.3.10');
     expect(cfg.getProperty<JSAny?>('onSuccess'.toJS).typeofEquals('function'), isTrue);
     expect(cfg.getProperty<JSAny?>('onFailure'.toJS).typeofEquals('function'), isTrue);
   });
